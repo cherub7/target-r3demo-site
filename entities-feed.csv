@@ -1,7 +1,0 @@
-entity.id,entity.name,entity.categoryId,entity.value,entity.thumbnailUrl,entity.pageUrl,entity.inventory
-r3demo-001,Laptop Computer,r3demo-electronics,999.99,https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop,http://localhost:8000/pages/recently-viewed.html,100
-r3demo-002,Wireless Mouse,r3demo-electronics,29.99,https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop,http://localhost:8000/pages/recently-viewed.html,100
-r3demo-003,Office Chair,r3demo-furniture,299.99,https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=200&h=200&fit=crop,http://localhost:8000/pages/recently-viewed.html,100
-r3demo-004,Desk Lamp,r3demo-furniture,49.99,https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=200&h=200&fit=crop,http://localhost:8000/pages/recently-viewed.html,100
-r3demo-005,Notebook Set,r3demo-stationery,15.99,https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop,http://localhost:8000/pages/recently-viewed.html,100
-

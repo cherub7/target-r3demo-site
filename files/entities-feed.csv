@@ -1,0 +1,12 @@
+## RECSRecommendations Upload File
+## RECS''## RECS'' indicates a Recommendations pre-process header. Please do not remove these lines.
+## RECS
+## RECSUse this file to upload product display information to Recommendations. Each product has its own row. Each line must contain 19 values and if not all are filled a space should be left.
+## RECSThe last 100 columns (entity.custom1 - entity.custom100) are custom. The name 'customN' can be replaced with a custom name such as 'onSale' or 'brand'.
+## RECSIf the products already exist in Recommendations then changes uploaded here will override the data in Recommendations. Any new attributes entered here will be added to the product''s entry in Recommendations.
+## RECSentity.id,entity.name,entity.categoryId,entity.message,entity.thumbnailUrl,entity.value,entity.pageUrl,entity.inventory,entity.margin,entity.custom1,entity.custom2,entity.custom3,entity.custom4,entity.custom5,entity.custom6,entity.custom7,entity.custom8,entity.custom9,entity.custom10
+r3demo-001,Laptop Computer,r3demo-electronics,,https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop,999.99,http://localhost:8000/pages/recently-viewed.html,100,,,,,,,,,,,
+r3demo-002,Wireless Mouse,r3demo-electronics,,https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop,29.99,http://localhost:8000/pages/recently-viewed.html,100,,,,,,,,,,,
+r3demo-003,Office Chair,r3demo-furniture,,https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=200&h=200&fit=crop,299.99,http://localhost:8000/pages/recently-viewed.html,100,,,,,,,,,,,
+r3demo-004,Desk Lamp,r3demo-furniture,,https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=200&h=200&fit=crop,49.99,http://localhost:8000/pages/recently-viewed.html,100,,,,,,,,,,,
+r3demo-005,Notebook Set,r3demo-stationery,,https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop,15.99,http://localhost:8000/pages/recently-viewed.html,100,,,,,,,,,,,
