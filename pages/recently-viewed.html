@@ -2,18 +2,190 @@
 <html>
 <head>
     <title>Recently Viewed</title>
+    <style>
+        .item-buttons { margin: 20px 0; }
+        .item-button { 
+            display: flex;
+            align-items: center;
+            margin: 10px 0; 
+            padding: 10px 20px; 
+            cursor: pointer;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .item-button:hover { background: #e0e0e0; }
+        .item-button img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        .recommendations { 
+            margin-top: 40px; 
+            padding: 20px; 
+            border-top: 2px solid #333; 
+        }
+    </style>
+    <script>
+        // Adobe Target configuration
+        window.targetGlobalSettings = {
+            clientCode: 'bullseye',
+            serverDomain: 'bullseye.tt.omtrdc.net',
+            timeout: 3000
+        };
+
+        // Track item view when button is clicked
+        function viewItem(itemId, itemName, categoryId, value, imageUrl) {
+            console.log('Viewing item:', itemId, itemName);
+            
+            // Send view event to Adobe Target with complete entity data
+            if (typeof adobe !== 'undefined' && adobe.target) {
+                adobe.target.trackEvent({
+                    mbox: 'item-view-mbox',
+                    params: {
+                        'entity.id': itemId,
+                        'entity.name': itemName,
+                        'entity.categoryId': categoryId,
+                        'entity.value': value,
+                        'entity.pageUrl': window.location.href,
+                        'entity.thumbnailUrl': imageUrl || '',
+                        'entity.inventory': '100'
+                    },
+                    success: function(response) {
+                        console.log('Target view event sent successfully:', response);
+                        // Refresh recommendations after view
+                        refreshRecommendations();
+                    },
+                    error: function(status, error) {
+                        console.log('Target view event error:', status, error);
+                    }
+                });
+            }
+            
+            // Also track locally for fallback
+            trackLocalView(itemId, itemName, categoryId, value);
+        }
+
+        // Local tracking fallback
+        function trackLocalView(itemId, itemName, categoryId, value) {
+            const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+            
+            const item = { 
+                id: itemId, 
+                name: itemName, 
+                categoryId: categoryId,
+                value: value,
+                timestamp: Date.now() 
+            };
+            const filtered = recentlyViewed.filter(i => i.id !== itemId);
+            filtered.unshift(item);
+            
+            localStorage.setItem('recentlyViewed', JSON.stringify(filtered.slice(0, 10)));
+            renderLocalRecommendations();
+        }
+
+        // Refresh Target recommendations
+        function refreshRecommendations() {
+            if (typeof adobe !== 'undefined' && adobe.target) {
+                adobe.target.getOffer({
+                    mbox: 'recently-viewed-recs',
+                    success: function(offer) {
+                        adobe.target.applyOffer({ 
+                            mbox: 'recently-viewed-recs',
+                            offer: offer 
+                        });
+                    },
+                    error: function(status, error) {
+                        console.log('Recommendations error:', status, error);
+                    }
+                });
+            }
+        }
+
+        // Render local recommendations (fallback)
+        function renderLocalRecommendations() {
+            const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+            const container = document.getElementById('local-recs');
+            
+            if (recentlyViewed.length === 0) {
+                container.innerHTML = '<p>Click items above to view them</p>';
+                return;
+            }
+            
+            let html = '<h3>Local Fallback (Recently Viewed):</h3><ul>';
+            recentlyViewed.forEach(item => {
+                html += `<li>${item.name} (ID: ${item.id}, Category: ${item.categoryId})</li>`;
+            });
+            html += '</ul>';
+            
+            container.innerHTML = html;
+        }
+
+        // Clear local fallback
+        function clearLocalFallback() {
+            localStorage.removeItem('recentlyViewed');
+            renderLocalRecommendations();
+            console.log('Local fallback cleared');
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', function() {
+            renderLocalRecommendations();
+        });
+    </script>
+    <!-- Adobe Target at.js library -->
+    <script src="../scripts/at.js"></script>
 </head>
 <body>
-    <h1>Recently Viewed</h1>
-    <p>
-        todo: section to describe the algorithm
-    </p>
-    <p>
-        todo: section to send events to target
-    </p>
-    <p>
-        todo: section to show the recommendations
-    </p>
-    <a href="../index.html">Back</a>
+    <h1>Recently Viewed Demo</h1>
+    
+    <div class="item-buttons">
+        <h2>Click to View Items:</h2>
+        <button class="item-button" onclick="viewItem('r3demo-001', 'Laptop Computer', 'r3demo-electronics', '999.99', '../files/images/laptop.jpg')">
+            <img src="../files/images/laptop.jpg" alt="Laptop Computer">
+            <span>View Item 1: Laptop Computer - $999.99</span>
+        </button>
+        <button class="item-button" onclick="viewItem('r3demo-002', 'Wireless Mouse', 'r3demo-electronics', '29.99', '../files/images/mouse.jpg')">
+            <img src="../files/images/mouse.jpg" alt="Wireless Mouse">
+            <span>View Item 2: Wireless Mouse - $29.99</span>
+        </button>
+        <button class="item-button" onclick="viewItem('r3demo-003', 'Office Chair', 'r3demo-furniture', '299.99', '../files/images/chair.jpg')">
+            <img src="../files/images/chair.jpg" alt="Office Chair">
+            <span>View Item 3: Office Chair - $299.99</span>
+        </button>
+        <button class="item-button" onclick="viewItem('r3demo-004', 'Desk Lamp', 'r3demo-furniture', '49.99', '../files/images/lamp.jpg')">
+            <img src="../files/images/lamp.jpg" alt="Desk Lamp">
+            <span>View Item 4: Desk Lamp - $49.99</span>
+        </button>
+        <button class="item-button" onclick="viewItem('r3demo-005', 'Notebook Set', 'r3demo-stationery', '15.99', '../files/images/notebook.jpg')">
+            <img src="../files/images/notebook.jpg" alt="Notebook Set">
+            <span>View Item 5: Notebook Set - $15.99</span>
+        </button>
+    </div>
+    
+    <div class="recommendations">
+        <h2>Adobe Target Recommendations:</h2>
+        <!-- Target recommendations mbox -->
+        <div data-mbox="recently-viewed-recs" class="mboxDefault">
+            <div id="target-recs">
+                <p>Recommendations will appear here once Target is configured...</p>
+            </div>
+        </div>
+        
+        <!-- Local fallback display -->
+        <div id="local-recs" style="margin-top: 20px; padding: 10px; background: #f9f9f9;">
+            <p>Click items above to view them</p>
+        </div>
+        <button onclick="clearLocalFallback()" style="margin-top: 10px; padding: 8px 16px;">
+            Clear Local Fallback
+        </button>
+    </div>
+    
+    <div style="margin-top: 30px;">
+        <a href="../index.html">Back</a>
+    </div>
 </body>
 </html>
