@@ -93,10 +93,12 @@
             if (typeof adobe !== 'undefined' && adobe.target) {
                 adobe.target.getOffer({
                     mbox: 'r3demo-recently-viewed-recs',
+                    selector: '#target-recs',
                     success: function(offer) {
                         console.log('✅ Recommendations offer received:', offer);
                         adobe.target.applyOffer({ 
                             mbox: 'r3demo-recently-viewed-recs',
+                            selector: '#target-recs',
                             offer: offer 
                         });
                     },
@@ -145,10 +147,12 @@
                     console.log('Requesting recommendations mbox...');
                     adobe.target.getOffer({
                         mbox: 'r3demo-recently-viewed-recs',
+                        selector: '#target-recs',
                         success: function(offer) {
                             console.log('Recommendations offer received:', offer);
                             adobe.target.applyOffer({ 
                                 mbox: 'r3demo-recently-viewed-recs',
+                                selector: '#target-recs',
                                 offer: offer 
                             });
                         },
