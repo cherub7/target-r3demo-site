@@ -91,10 +91,10 @@
         function refreshRecommendations() {
             if (typeof adobe !== 'undefined' && adobe.target) {
                 adobe.target.getOffer({
-                    mbox: 'recently-viewed-recs',
+                    mbox: 'r3demo-recently-viewed-recs',
                     success: function(offer) {
                         adobe.target.applyOffer({ 
-                            mbox: 'recently-viewed-recs',
+                            mbox: 'r3demo-recently-viewed-recs',
                             offer: offer 
                         });
                     },
@@ -169,7 +169,7 @@
     <div class="recommendations">
         <h2>Adobe Target Recommendations:</h2>
         <!-- Target recommendations mbox -->
-        <div data-mbox="recently-viewed-recs" class="mboxDefault">
+        <div data-mbox="r3demo-recently-viewed-recs" class="mboxDefault">
             <div id="target-recs">
                 <p>Recommendations will appear here once Target is configured...</p>
             </div>
