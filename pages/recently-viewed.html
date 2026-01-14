@@ -1,32 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Recently Viewed</title>
+    <title>Recently Viewed Demo</title>
+    <link rel="stylesheet" href="../files/bootstrap.min.css">
     <style>
-        .item-buttons { margin: 20px 0; }
-        .item-button { 
-            display: flex;
-            align-items: center;
-            margin: 10px 0; 
-            padding: 10px 20px; 
-            cursor: pointer;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: left;
+        /* Modern color palette and spacing */
+        body {
+            background: #f8f9fa;
         }
-        .item-button:hover { background: #e0e0e0; }
-        .item-button img {
-            width: 60px;
-            height: 60px;
+        
+        /* Card headers - solid dark colors */
+        .section-header {
+            background: #2d3748;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+        
+        /* Main content cards */
+        .content-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Product cards - uniform styling */
+        #available-items .card,
+        #target-recs .card {
+            min-width: 150px;
+            max-width: 150px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        #available-items .card:hover,
+        #target-recs .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        #available-items .card-img-top,
+        #target-recs .card-img-top {
+            height: 120px;
             object-fit: cover;
-            border-radius: 4px;
-            margin-right: 15px;
+            border-radius: 8px 8px 0 0;
         }
-        .recommendations { 
-            margin-top: 40px; 
-            padding: 20px; 
-            border-top: 2px solid #333; 
+        
+        #available-items .card-body,
+        #target-recs .card-body {
+            padding: 0.75rem;
+        }
+        
+        #available-items h4, #available-items h5, #available-items h6,
+        #target-recs h4, #target-recs h5, #target-recs h6 {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        #available-items p,
+        #target-recs p {
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Buttons - modern styling with solid colors */
+        .btn-primary {
+            background: #4a5568;
+            border: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2d3748;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(45, 55, 72, 0.4);
+        }
+        
+        .btn-light {
+            background: white;
+            border: none;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .btn-light:hover {
+            background: #f7fafc;
+            color: #2d3748;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-outline-secondary {
+            border-color: #cbd5e0;
+            color: #4a5568;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #4a5568;
+            border-color: #4a5568;
+            color: white;
         }
     </style>
     <script>
@@ -39,9 +124,6 @@
 
         // Track item view when button is clicked
         function viewItem(itemId, itemName, categoryId, value, imageUrl) {
-            console.log('Viewing item:', itemId, itemName);
-            
-            // Send view event to Adobe Target with complete entity data
             if (typeof adobe !== 'undefined' && adobe.target) {
                 adobe.target.trackEvent({
                     mbox: 'item-view-mbox',
@@ -51,174 +133,235 @@
                         'entity.categoryId': categoryId,
                         'entity.value': value,
                         'entity.pageUrl': window.location.href,
-                        'entity.thumbnailUrl': imageUrl || '',
+                        'entity.thumbnailUrl': imageUrl,
                         'entity.inventory': '100'
                     },
-                    success: function(response) {
-                        console.log('Target view event sent successfully:', response);
-                        // Refresh recommendations after view
+                    success: function() {
                         refreshRecommendations();
-                    },
-                    error: function(status, error) {
-                        console.log('Target view event error:', status, error);
                     }
                 });
             }
-            
-            // Also track locally for fallback
-            trackLocalView(itemId, itemName, categoryId, value);
-        }
-
-        // Local tracking fallback
-        function trackLocalView(itemId, itemName, categoryId, value) {
-            const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-            
-            const item = { 
-                id: itemId, 
-                name: itemName, 
-                categoryId: categoryId,
-                value: value,
-                timestamp: Date.now() 
-            };
-            const filtered = recentlyViewed.filter(i => i.id !== itemId);
-            filtered.unshift(item);
-            
-            localStorage.setItem('recentlyViewed', JSON.stringify(filtered.slice(0, 10)));
-            renderLocalRecommendations();
         }
 
         // Refresh Target recommendations
         function refreshRecommendations() {
-            console.log('🔄 Refreshing recommendations mbox...');
+            const container = document.getElementById('target-recs');
+            container.style.opacity = '0.3';
+            container.style.transition = 'opacity 0.3s ease-out';
+            
             if (typeof adobe !== 'undefined' && adobe.target) {
                 adobe.target.getOffer({
                     mbox: 'r3demo-recently-viewed-recs',
                     selector: '#target-recs',
                     success: function(offer) {
-                        console.log('✅ Recommendations offer received:', offer);
                         adobe.target.applyOffer({ 
                             mbox: 'r3demo-recently-viewed-recs',
                             selector: '#target-recs',
                             offer: offer 
                         });
+                        setTimeout(function() {
+                            container.style.transition = 'opacity 2s ease-in';
+                            container.style.opacity = '1';
+                        }, 100);
                     },
-                    error: function(status, error) {
-                        console.log('❌ Recommendations error:', status, error);
+                    error: function() {
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity = '1';
                     }
                 });
             } else {
-                console.log('⚠️ Adobe Target not loaded');
+                container.style.transition = 'opacity 2s ease-in';
+                container.style.opacity = '1';
             }
-        }
-
-        // Render local recommendations (fallback)
-        function renderLocalRecommendations() {
-            const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-            const container = document.getElementById('local-recs');
-            
-            if (recentlyViewed.length === 0) {
-                container.innerHTML = '<p>Click items above to view them</p>';
-                return;
-            }
-            
-            let html = '<h3>Local Fallback (Recently Viewed):</h3><ul>';
-            recentlyViewed.forEach(item => {
-                html += `<li>${item.name} (ID: ${item.id}, Category: ${item.categoryId})</li>`;
-            });
-            html += '</ul>';
-            
-            container.innerHTML = html;
-        }
-
-        // Clear local fallback
-        function clearLocalFallback() {
-            localStorage.removeItem('recentlyViewed');
-            renderLocalRecommendations();
-            console.log('Local fallback cleared');
         }
 
         // Initialize
         window.addEventListener('DOMContentLoaded', function() {
-            renderLocalRecommendations();
+            // Display current user agent
+            const ua = navigator.userAgent;
+            const currentUAElement = document.getElementById('currentUA');
+            currentUAElement.textContent = ua;
             
-            // Request recommendations on page load
-            setTimeout(function() {
-                if (typeof adobe !== 'undefined' && adobe.target) {
-                    console.log('Requesting recommendations mbox...');
-                    adobe.target.getOffer({
-                        mbox: 'r3demo-recently-viewed-recs',
-                        selector: '#target-recs',
-                        success: function(offer) {
-                            console.log('Recommendations offer received:', offer);
-                            adobe.target.applyOffer({ 
-                                mbox: 'r3demo-recently-viewed-recs',
-                                selector: '#target-recs',
-                                offer: offer 
-                            });
-                        },
-                        error: function(status, error) {
-                            console.log('Recommendations error:', status, error);
-                        }
-                    });
-                } else {
-                    console.log('Adobe Target not loaded yet');
-                }
-            }, 1000); // Wait 1 second for at.js to fully load
+            // Highlight if bot detected
+            if (ua.toLowerCase().includes('bot') || ua.toLowerCase().includes('crawler')) {
+                currentUAElement.style.background = '#d4edda';
+                currentUAElement.style.color = '#155724';
+                currentUAElement.style.fontWeight = '600';
+            }
+            
+            setTimeout(refreshRecommendations, 1000);
         });
     </script>
     <!-- Adobe Target at.js library -->
     <script src="../scripts/at.js"></script>
 </head>
 <body>
-    <h1>Recently Viewed Demo</h1>
-    
-    <div class="item-buttons">
-        <h2>Click to View Items:</h2>
-        <button class="item-button" onclick="viewItem('r3demo-001', 'Laptop Computer', 'r3demo-electronics', '999.99', '../files/images/laptop.jpg')">
-            <img src="../files/images/laptop.jpg" alt="Laptop Computer">
-            <span>View Item 1: Laptop Computer - $999.99</span>
-        </button>
-        <button class="item-button" onclick="viewItem('r3demo-002', 'Wireless Mouse', 'r3demo-electronics', '29.99', '../files/images/mouse.jpg')">
-            <img src="../files/images/mouse.jpg" alt="Wireless Mouse">
-            <span>View Item 2: Wireless Mouse - $29.99</span>
-        </button>
-        <button class="item-button" onclick="viewItem('r3demo-003', 'Office Chair', 'r3demo-furniture', '299.99', '../files/images/chair.jpg')">
-            <img src="../files/images/chair.jpg" alt="Office Chair">
-            <span>View Item 3: Office Chair - $299.99</span>
-        </button>
-        <button class="item-button" onclick="viewItem('r3demo-004', 'Desk Lamp', 'r3demo-furniture', '49.99', '../files/images/lamp.jpg')">
-            <img src="../files/images/lamp.jpg" alt="Desk Lamp">
-            <span>View Item 4: Desk Lamp - $49.99</span>
-        </button>
-        <button class="item-button" onclick="viewItem('r3demo-005', 'Notebook Set', 'r3demo-stationery', '15.99', '../files/images/notebook.jpg')">
-            <img src="../files/images/notebook.jpg" alt="Notebook Set">
-            <span>View Item 5: Notebook Set - $15.99</span>
-        </button>
-    </div>
-    
-    <div class="recommendations">
-        <h2>Adobe Target Recommendations:</h2>
-        <button onclick="refreshRecommendations()" style="margin-bottom: 10px; padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            🔄 Refresh Recommendations
-        </button>
-        <!-- Target recommendations mbox -->
-        <div data-mbox="r3demo-recently-viewed-recs" class="mboxDefault">
-            <div id="target-recs">
-                <p>Recommendations will appear here once Target is configured...</p>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold" style="color: #2d3748;">
+                Recently Viewed Demo
+            </h1>
+        </div>
+        
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">Available Items</h2>
+            </div>
+            <div class="card-body">
+                <div id="available-items" class="d-flex flex-wrap" style="gap: 15px;">
+                    <div class="card text-center">
+                        <img src="../files/images/laptop.jpg" class="card-img-top" alt="Laptop Computer">
+                        <div class="card-body">
+                            <h6 class="card-title">Laptop Computer</h6>
+                            <p class="card-text text-primary fw-bold">$999.99</p>
+                            <button class="btn btn-primary btn-sm w-100" onclick="viewItem('r3demo-001', 'Laptop Computer', 'r3demo-electronics', '999.99', '../files/images/laptop.jpg')">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card text-center">
+                        <img src="../files/images/mouse.jpg" class="card-img-top" alt="Wireless Mouse">
+                        <div class="card-body">
+                            <h6 class="card-title">Wireless Mouse</h6>
+                            <p class="card-text text-primary fw-bold">$29.99</p>
+                            <button class="btn btn-primary btn-sm w-100" onclick="viewItem('r3demo-002', 'Wireless Mouse', 'r3demo-electronics', '29.99', '../files/images/mouse.jpg')">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card text-center">
+                        <img src="../files/images/chair.jpg" class="card-img-top" alt="Office Chair">
+                        <div class="card-body">
+                            <h6 class="card-title">Office Chair</h6>
+                            <p class="card-text text-primary fw-bold">$299.99</p>
+                            <button class="btn btn-primary btn-sm w-100" onclick="viewItem('r3demo-003', 'Office Chair', 'r3demo-furniture', '299.99', '../files/images/chair.jpg')">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card text-center">
+                        <img src="../files/images/lamp.jpg" class="card-img-top" alt="Desk Lamp">
+                        <div class="card-body">
+                            <h6 class="card-title">Desk Lamp</h6>
+                            <p class="card-text text-primary fw-bold">$49.99</p>
+                            <button class="btn btn-primary btn-sm w-100" onclick="viewItem('r3demo-004', 'Desk Lamp', 'r3demo-furniture', '49.99', '../files/images/lamp.jpg')">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card text-center">
+                        <img src="../files/images/notebook.jpg" class="card-img-top" alt="Notebook Set">
+                        <div class="card-body">
+                            <h6 class="card-title">Notebook Set</h6>
+                            <p class="card-text text-primary fw-bold">$15.99</p>
+                            <button class="btn btn-primary btn-sm w-100" onclick="viewItem('r3demo-005', 'Notebook Set', 'r3demo-stationery', '15.99', '../files/images/notebook.jpg')">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Local fallback display -->
-        <div id="local-recs" style="margin-top: 20px; padding: 10px; background: #f9f9f9;">
-            <p>Click items above to view them</p>
+        <div class="card content-card">
+            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Your Recently Viewed Items</h2>
+                <button onclick="refreshRecommendations()" class="btn btn-light btn-sm">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="target-recs">
+                    <div class="alert alert-info">
+                        <strong>No items viewed yet.</strong> Click on items above to view them.
+                    </div>
+                </div>
+            </div>
         </div>
-        <button onclick="clearLocalFallback()" style="margin-top: 10px; padding: 8px 16px;">
-            Clear Local Fallback
-        </button>
+        
+        <!-- Testing Guide Section -->
+        <div class="card content-card mt-5">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">📝 Testing Guide</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Bot User-Agent -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="d-flex align-items-start gap-3">
+                            <span style="font-size: 2rem;">🤖</span>
+                            <div style="flex: 1;">
+                                <h6 class="fw-bold mb-2" style="color: #2d3748;">Test with Bot User-Agent</h6>
+                                <p class="mb-3 small text-muted">Open DevTools (F12) → Network conditions Tab → Change User agent to "Googlebot"</p>
+                                <div>
+                                    <small class="text-muted d-block mb-2"><strong>Current User-Agent:</strong></small>
+                                    <code id="currentUA" style="word-break: break-all; background: #f7fafc; padding: 8px 12px; border-radius: 6px; display: block; font-size: 0.75rem; border: 1px solid #e2e8f0;">Loading...</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- New Session -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="d-flex align-items-start gap-3">
+                            <span style="font-size: 2rem;">🔄</span>
+                            <div style="flex: 1;">
+                                <h6 class="fw-bold mb-2" style="color: #2d3748;">Start a New Session</h6>
+                                <p class="mb-2 small text-muted">To test with a fresh visitor profile:</p>
+                                <ul class="mb-0 small text-muted" style="padding-left: 1.2rem;">
+                                    <li class="mb-2">Open page in <strong>Incognito/Private mode</strong>, OR</li>
+                                    <li>Manually delete cookies from Developer Tools<br><span class="text-muted" style="font-size: 0.85em;">(Application → Cookies)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Details -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="d-flex align-items-start gap-3">
+                            <span style="font-size: 2rem;">🎯</span>
+                            <div style="flex: 1;">
+                                <h6 class="fw-bold mb-2" style="color: #2d3748;">Activity Details</h6>
+                                <p class="mb-2 small text-muted">For debugging and troubleshooting:</p>
+                                <div class="small">
+                                    <div class="mb-2">
+                                        <strong style="color: #4a5568;">Client:</strong>
+                                        <code style="background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">bullseye</code>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong style="color: #4a5568;">Activity ID:</strong>
+                                        <code style="background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">1674070</code>
+                                    </div>
+                                    <div>
+                                        <strong style="color: #4a5568;">Rec-Unit ID:</strong>
+                                        <code style="background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">387820</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Splunk Query -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="d-flex align-items-start gap-3">
+                            <span style="font-size: 2rem;">🔍</span>
+                            <div style="flex: 1;">
+                                <h6 class="fw-bold mb-2" style="color: #2d3748;">Splunk Query</h6>
+                                <p class="mb-2 small text-muted">Debug requests in Splunk:</p>
+                                <code style="word-break: break-all; background: #f7fafc; padding: 8px 12px; border-radius: 6px; display: block; font-size: 0.7rem; border: 1px solid #e2e8f0; line-height: 1.5;">index=target container_name=edge "&lt;session_id&gt;"</code>
+                                <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">Replace <code style="background: #fff3cd; padding: 1px 4px; border-radius: 2px;">&lt;session_id&gt;</code> with sessionId from Network tab</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="../index.html" class="btn btn-outline-secondary" style="border-radius: 8px; padding: 0.5rem 1.5rem;">← Back to Home</a>
+        </div>
     </div>
-    
-    <div style="margin-top: 30px;">
-        <a href="../index.html">Back</a>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
