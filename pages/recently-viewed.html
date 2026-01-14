@@ -89,19 +89,23 @@
 
         // Refresh Target recommendations
         function refreshRecommendations() {
+            console.log('🔄 Refreshing recommendations mbox...');
             if (typeof adobe !== 'undefined' && adobe.target) {
                 adobe.target.getOffer({
                     mbox: 'r3demo-recently-viewed-recs',
                     success: function(offer) {
+                        console.log('✅ Recommendations offer received:', offer);
                         adobe.target.applyOffer({ 
                             mbox: 'r3demo-recently-viewed-recs',
                             offer: offer 
                         });
                     },
                     error: function(status, error) {
-                        console.log('Recommendations error:', status, error);
+                        console.log('❌ Recommendations error:', status, error);
                     }
                 });
+            } else {
+                console.log('⚠️ Adobe Target not loaded');
             }
         }
 
@@ -134,6 +138,28 @@
         // Initialize
         window.addEventListener('DOMContentLoaded', function() {
             renderLocalRecommendations();
+            
+            // Request recommendations on page load
+            setTimeout(function() {
+                if (typeof adobe !== 'undefined' && adobe.target) {
+                    console.log('Requesting recommendations mbox...');
+                    adobe.target.getOffer({
+                        mbox: 'r3demo-recently-viewed-recs',
+                        success: function(offer) {
+                            console.log('Recommendations offer received:', offer);
+                            adobe.target.applyOffer({ 
+                                mbox: 'r3demo-recently-viewed-recs',
+                                offer: offer 
+                            });
+                        },
+                        error: function(status, error) {
+                            console.log('Recommendations error:', status, error);
+                        }
+                    });
+                } else {
+                    console.log('Adobe Target not loaded yet');
+                }
+            }, 1000); // Wait 1 second for at.js to fully load
         });
     </script>
     <!-- Adobe Target at.js library -->
@@ -168,6 +194,9 @@
     
     <div class="recommendations">
         <h2>Adobe Target Recommendations:</h2>
+        <button onclick="refreshRecommendations()" style="margin-bottom: 10px; padding: 8px 16px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            🔄 Refresh Recommendations
+        </button>
         <!-- Target recommendations mbox -->
         <div data-mbox="r3demo-recently-viewed-recs" class="mboxDefault">
             <div id="target-recs">
