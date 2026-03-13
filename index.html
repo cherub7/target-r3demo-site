@@ -2,10 +2,74 @@
 <html>
 <head>
     <title>Target R3 Demo</title>
+    <link rel="stylesheet" href="files/bootstrap.min.css">
+    <style>
+        body { background: #f8f9fa; padding: 2rem; }
+        .page-title {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .nav-prompt {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        .algo-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .algo-card {
+            display: block;
+            width: 280px;
+            padding: 1.25rem;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .algo-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .algo-card-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .algo-card-meta {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        .algo-card-meta strong {
+            color: #2d3748;
+        }
+        .algo-card-desc {
+            font-size: 0.875rem;
+            color: #718096;
+            line-height: 1.4;
+        }
+    </style>
 </head>
 <body>
-    <a href="pages/recently-viewed.html">Recently Viewed</a>
-    <br>
-    <a href="pages/most-viewed-across-site.html">Most Viewed Across Site</a>
+    <h1 class="page-title">Target R3 Demo</h1>
+    <p class="nav-prompt">Select an algorithm to try:</p>
+    <nav class="algo-cards">
+        <a href="pages/recently-viewed.html" class="algo-card">
+            <div class="algo-card-title">Recently Viewed</div>
+            <div class="algo-card-meta"><strong>Backing activity:</strong> r3demo recently viewed activity (1674070)</div>
+            <div class="algo-card-desc">See a list of items you've recently looked at. Quickly access your browsing history within the demo site.</div>
+        </a>
+        <a href="pages/most-viewed-across-site.html" class="algo-card">
+            <div class="algo-card-title">Most Viewed Across Site</div>
+            <div class="algo-card-meta"><strong>Backing activity:</strong> r3demo most viewed activity (1692448)</div>
+            <div class="algo-card-desc">Discover the most frequently viewed items across the entire site. Highlights trending content for all users.</div>
+        </a>
+    </nav>
 </body>
 </html>

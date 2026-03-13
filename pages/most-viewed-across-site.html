@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Most Viewed Across Site (OTT) – Demo</title>
+    <title>Most Viewed Across Site Demo</title>
     <link rel="stylesheet" href="../files/bootstrap.min.css">
     <style>
         body { background: #f8f9fa; }
@@ -144,7 +144,7 @@
                     mbox: RECS_MBOX,
                     selector: '#target-recs-most-viewed',
                     success: function (offer) {
-                        console.log('[Recs] getOffer success, mbox=' + RECS_MBOX, 'pageUrl=' + window.location.href, offer);
+                        // console.log('[Recs] getOffer success, mbox=' + RECS_MBOX, 'pageUrl=' + window.location.href, offer);
                         adobe.target.applyOffer({ mbox: RECS_MBOX, selector: '#target-recs-most-viewed', offer: offer });
                         setTimeout(function () {
                             container.style.transition = 'opacity 2s ease-in';
