@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Most Viewed Across Site (OTT) – Demo</title>
+    <link rel="stylesheet" href="../files/bootstrap.min.css">
+    <style>
+        body { background: #f8f9fa; }
+        .section-header {
+            background: #2d3748;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+        .content-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .content-card:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); }
+        #catalog .card {
+            min-width: 140px;
+            max-width: 140px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        #catalog .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        #catalog .card-img-top {
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            background: #e2e8f0;
+        }
+        #catalog .card-body { padding: 0.75rem; }
+        #catalog .card-title { font-size: 0.8rem; margin-bottom: 0.5rem; color: #2d3748; font-weight: 600; }
+        #target-recs-most-viewed .card { min-width: 140px; max-width: 140px; border: 1px solid #e9ecef; border-radius: 8px; }
+        #target-recs-most-viewed .card-img-top { height: 100px; object-fit: cover; border-radius: 8px 8px 0 0; }
+        #target-recs-most-viewed .card-body { padding: 0.75rem; }
+        #target-recs-most-viewed .card-title { font-size: 0.8rem; color: #2d3748; font-weight: 600; }
+        .btn-primary {
+            background: #4a5568;
+            border: none;
+            font-weight: 500;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        .btn-primary:hover { background: #2d3748; }
+        .btn-light { background: white; border: none; color: #2d3748; font-weight: 600; }
+        .view-count-input { width: 4rem; text-align: center; }
+    </style>
+    <script>
+        // Set this to the mbox name you create for the Most Viewed activity in Bullet UI
+        var RECS_MBOX = 'r3demo-most-viewed-recs';
+
+        window.targetGlobalSettings = {
+            clientCode: 'bullseye',
+            serverDomain: 'bullseye.tt.omtrdc.net',
+            timeout: 3000
+        };
+
+        // OTT catalog – matches entities-feed-ott.csv
+        var CATALOG = [
+            { id: 'ott-001', name: 'The Last Frontier', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Action', type: 'movie' },
+            { id: 'ott-002', name: 'Midnight Signal', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Sci-Fi', type: 'movie' },
+            { id: 'ott-003', name: 'Valley of Echoes', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Drama', type: 'movie' },
+            { id: 'ott-004', name: 'Neon Drive', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Thriller', type: 'movie' },
+            { id: 'ott-005', name: 'Summer in Barcelona', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Romance', type: 'movie' },
+            { id: 'ott-006', name: 'Code Black', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Action', type: 'movie' },
+            { id: 'ott-007', name: 'The Quiet Room', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Drama', type: 'movie' },
+            { id: 'ott-008', name: 'Deep Space', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Sci-Fi', type: 'movie' },
+            { id: 'ott-009', name: 'Shadow Lane', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Thriller', type: 'movie' },
+            { id: 'ott-010', name: 'First Light', categoryId: 'r3demo-ott-series', value: '0', genre: 'Drama', type: 'series' },
+            { id: 'ott-011', name: 'Grid Lock', categoryId: 'r3demo-ott-series', value: '0', genre: 'Sci-Fi', type: 'series' },
+            { id: 'ott-012', name: 'High Stakes', categoryId: 'r3demo-ott-series', value: '0', genre: 'Thriller', type: 'series' },
+            { id: 'ott-013', name: 'North Shore', categoryId: 'r3demo-ott-series', value: '0', genre: 'Drama', type: 'series' },
+            { id: 'ott-014', name: 'Zero Hour', categoryId: 'r3demo-ott-series', value: '0', genre: 'Action', type: 'series' },
+            { id: 'ott-015', name: 'The Loop', categoryId: 'r3demo-ott-series', value: '0', genre: 'Sci-Fi', type: 'series' },
+            { id: 'ott-016', name: 'Crime & Order', categoryId: 'r3demo-ott-series', value: '0', genre: 'Thriller', type: 'series' },
+            { id: 'ott-017', name: 'Sunset Blvd', categoryId: 'r3demo-ott-series', value: '0', genre: 'Drama', type: 'series' },
+            { id: 'ott-018', name: 'Binary', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Sci-Fi', type: 'movie' },
+            { id: 'ott-019', name: 'Family Ties', categoryId: 'r3demo-ott-series', value: '0', genre: 'Comedy', type: 'series' },
+            { id: 'ott-020', name: 'Final Run', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Action', type: 'movie' }
+        ];
+
+        function getViewCountFor(entityId) {
+            var el = document.querySelector('[data-entity-id="' + entityId + '"] .view-count-input');
+            if (!el) return 1;
+            var n = parseInt(el.value, 10);
+            return isNaN(n) || n < 1 ? 1 : Math.min(n, 50);
+        }
+
+        function viewItemOnce(item, done) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                if (done) done();
+                return;
+            }
+            var params = {
+                'entity.id': item.id,
+                'entity.name': item.name,
+                'entity.categoryId': item.categoryId,
+                'entity.value': item.value,
+                'entity.pageUrl': window.location.href,
+                'entity.thumbnailUrl': '../files/images/' + item.id + '.jpg',
+                'entity.inventory': '100'
+            };
+            adobe.target.trackEvent({
+                mbox: 'item-view-mbox',
+                params: params,
+                success: function () { if (done) done(); },
+                error: function () { if (done) done(); }
+            });
+        }
+
+        function viewItem(entityId) {
+            var item = CATALOG.find(function (m) { return m.id === entityId; });
+            if (!item) return;
+            var count = getViewCountFor(entityId);
+            var idx = 0;
+            function next() {
+                if (idx >= count) {
+                    updateLastAction('Recorded ' + count + ' view(s) for ' + item.name + '.');
+                    refreshRecommendations();
+                    return;
+                }
+                viewItemOnce(item, function () {
+                    idx++;
+                    setTimeout(next, 200);
+                });
+            }
+            next();
+        }
+
+        function refreshRecommendations() {
+            var container = document.getElementById('target-recs-most-viewed');
+            if (!container) return;
+            container.style.opacity = '0.3';
+            container.style.transition = 'opacity 0.3s ease-out';
+            if (typeof adobe !== 'undefined' && adobe.target) {
+                adobe.target.getOffer({
+                    mbox: RECS_MBOX,
+                    selector: '#target-recs-most-viewed',
+                    success: function (offer) {
+                        adobe.target.applyOffer({ mbox: RECS_MBOX, selector: '#target-recs-most-viewed', offer: offer });
+                        setTimeout(function () { container.style.transition = 'opacity 2s ease-in'; container.style.opacity = '1'; }, 100);
+                    },
+                    error: function () {
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity = '1';
+                    }
+                });
+            } else {
+                container.style.transition = 'opacity 2s ease-in';
+                container.style.opacity = '1';
+            }
+        }
+
+        function updateLastAction(msg) {
+            var el = document.getElementById('last-action');
+            if (el) {
+                el.textContent = msg;
+                el.style.visibility = 'visible';
+            }
+        }
+
+        function renderCatalog() {
+            var container = document.getElementById('catalog');
+            if (!container) return;
+            container.innerHTML = CATALOG.map(function (item) {
+                return '<div class="card text-center" data-entity-id="' + item.id + '">' +
+                    '<img src="../files/images/' + item.id + '.jpg" class="card-img-top" alt="' + item.name + '">' +
+                    '<div class="card-body">' +
+                    '<h6 class="card-title">' + item.name + '</h6>' +
+                    '<p class="small text-muted mb-1">' + item.genre + ' · ' + item.type + '</p>' +
+                    '<div class="mb-2">' +
+                    '<label class="small text-muted">Views</label>' +
+                    '<input type="number" class="form-control form-control-sm view-count-input mx-auto" value="1" min="1" max="50" title="Number of view events">' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-primary btn-sm w-100" onclick="viewItem(\'' + item.id + '\')">View</button>' +
+                    '</div></div>';
+            }).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            var label = document.getElementById('recs-mbox-label');
+            if (label) label.textContent = RECS_MBOX;
+            renderCatalog();
+            setTimeout(refreshRecommendations, 1000);
+        });
+    </script>
+    <script src="../scripts/at.js"></script>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-4">
+            <h1 class="display-6 fw-bold" style="color: #2d3748;">Most Viewed Across Site</h1>
+            <p class="text-muted small">Catalog from <code>files/entities-feed-ott.csv</code>. Click View to send view events for most-viewed ranking.</p>
+        </div>
+
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">OTT catalog</h2>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Click <strong>View</strong> to send view events (mbox: <code>item-view-mbox</code>) with <code>entity.*</code> params. Use the Views field to simulate multiple views per click.
+                </p>
+                <div id="last-action" class="small text-success mb-2" style="visibility: hidden;"></div>
+                <div id="catalog" class="d-flex flex-wrap" style="gap: 12px;"></div>
+            </div>
+        </div>
+
+        <div class="card content-card mb-4">
+            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Most Viewed – Recommendations</h2>
+                <button type="button" onclick="refreshRecommendations()" class="btn btn-light btn-sm">🔄 Refresh</button>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">Recs from Target (mbox: <code id="recs-mbox-label"></code>). Create the activity in Bullet UI with this mbox name, then refresh.</p>
+                <div id="target-recs-most-viewed" class="d-flex flex-wrap" style="gap: 12px;">
+                    <div class="alert alert-info mb-0">
+                        <strong>Loading…</strong> Configure a Most Viewed activity in Bullet UI with the mbox name above to see recommendations here.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">Feed &amp; config</h2>
+            </div>
+            <div class="card-body small">
+                <ul class="mb-0">
+                    <li>Entity feed: 20 OTT items (movies + series), <code>entity.custom1</code>=genre, <code>entity.custom2</code>=type.</li>
+                    <li>Criteria: configure <strong>Most Viewed Across Site</strong> (no grouping). Views drive site-wide popularity.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="../index.html" class="btn btn-outline-secondary">← Back to Home</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+## RECSRecommendations Upload File
+## RECS''## RECS'' indicates a Recommendations pre-process header. Please do not remove these lines.
+## RECS
+## RECSOTT catalog: movies and series. entity.custom1 = genre, entity.custom2 = type (movie|series).
+## RECSentity.id,entity.name,entity.categoryId,entity.message,entity.thumbnailUrl,entity.value,entity.pageUrl,entity.inventory,entity.margin,entity.custom1,entity.custom2,entity.custom3,entity.custom4,entity.custom5,entity.custom6,entity.custom7,entity.custom8,entity.custom9,entity.custom10
+ott-001,The Last Frontier,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-001.jpg,4.99,https://example.com/ott/ott-001,100,,Action,movie,,,,,,,,,,
+ott-002,Midnight Signal,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-002.jpg,4.99,https://example.com/ott/ott-002,100,,Sci-Fi,movie,,,,,,,,,,
+ott-003,Valley of Echoes,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-003.jpg,4.99,https://example.com/ott/ott-003,100,,Drama,movie,,,,,,,,,,
+ott-004,Neon Drive,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-004.jpg,4.99,https://example.com/ott/ott-004,100,,Thriller,movie,,,,,,,,,,
+ott-005,Summer in Barcelona,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-005.jpg,4.99,https://example.com/ott/ott-005,100,,Romance,movie,,,,,,,,,,
+ott-006,Code Black,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-006.jpg,4.99,https://example.com/ott/ott-006,100,,Action,movie,,,,,,,,,,
+ott-007,The Quiet Room,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-007.jpg,4.99,https://example.com/ott/ott-007,100,,Drama,movie,,,,,,,,,,
+ott-008,Deep Space,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-008.jpg,4.99,https://example.com/ott/ott-008,100,,Sci-Fi,movie,,,,,,,,,,
+ott-009,Shadow Lane,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-009.jpg,4.99,https://example.com/ott/ott-009,100,,Thriller,movie,,,,,,,,,,
+ott-010,First Light,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-010.jpg,0,https://example.com/ott/ott-010,100,,Drama,series,,,,,,,,,,
+ott-011,Grid Lock,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-011.jpg,0,https://example.com/ott/ott-011,100,,Sci-Fi,series,,,,,,,,,,
+ott-012,High Stakes,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-012.jpg,0,https://example.com/ott/ott-012,100,,Thriller,series,,,,,,,,,,
+ott-013,North Shore,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-013.jpg,0,https://example.com/ott/ott-013,100,,Drama,series,,,,,,,,,,
+ott-014,Zero Hour,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-014.jpg,0,https://example.com/ott/ott-014,100,,Action,series,,,,,,,,,,
+ott-015,The Loop,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-015.jpg,0,https://example.com/ott/ott-015,100,,Sci-Fi,series,,,,,,,,,,
+ott-016,Crime & Order,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-016.jpg,0,https://example.com/ott/ott-016,100,,Thriller,series,,,,,,,,,,
+ott-017,Sunset Blvd,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-017.jpg,0,https://example.com/ott/ott-017,100,,Drama,series,,,,,,,,,,
+ott-018,Binary,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-018.jpg,4.99,https://example.com/ott/ott-018,100,,Sci-Fi,movie,,,,,,,,,,
+ott-019,Family Ties,r3demo-ott-series,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-019.jpg,0,https://example.com/ott/ott-019,100,,Comedy,series,,,,,,,,,,
+ott-020,Final Run,r3demo-ott-movies,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/ott-020.jpg,4.99,https://example.com/ott/ott-020,100,,Action,movie,,,,,,,,,,
