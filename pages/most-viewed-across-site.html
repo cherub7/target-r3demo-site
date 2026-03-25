@@ -99,13 +99,7 @@
                 return;
             }
             var params = {
-                'entity.id': item.id,
-                'entity.name': item.name,
-                'entity.categoryId': item.categoryId,
-                'entity.value': item.value,
-                'entity.pageUrl': window.location.href,
-                'entity.thumbnailUrl': '../files/images/' + item.id + '.jpg',
-                'entity.inventory': '100'
+                'entity.id': item.id
             };
             adobe.target.trackEvent({
                 mbox: 'item-view-mbox',
@@ -123,7 +117,6 @@
             function next() {
                 if (idx >= count) {
                     updateLastAction('Recorded ' + count + ' view(s) for ' + item.name + '.');
-                    refreshRecommendations();
                     return;
                 }
                 viewItemOnce(item, function () {
