@@ -133,16 +133,13 @@
                 if (done) done();
                 return;
             }
-            // Use getOffer (execute.mboxes) instead of trackEvent (notifications).
-            // trackEvent in at.js 2.x sends a notifications call which does not feed
-            // the Recommendations session logger. getOffer sends execute.mboxes, which
-            // the training algorithm reads to build per-region entity usage counts.
-            adobe.target.getOffer({
+            var params = {
+                'entity.id': item.id,
+                'recsRegion': getSelectedRegion()
+            };
+            adobe.target.trackEvent({
                 mbox: 'item-view-mbox',
-                params: {
-                    'entity.id': item.id,
-                    recsRegion: getSelectedRegion()
-                },
+                params: params,
                 success: function () { if (done) done(); },
                 error: function () { if (done) done(); }
             });
@@ -291,6 +288,7 @@
                 <select id="region-select" class="form-select form-select-sm" style="width: auto; min-width: 120px;" onchange="refreshRecommendations()" title="Sent as mbox param recsRegion">
                     <option value="US" selected>US</option>
                     <option value="INDIA">INDIA</option>
+                    <option value="UK">UK</option>
                 </select>
                 <span class="text-muted small">(used for views + recs)</span>
             </div>
