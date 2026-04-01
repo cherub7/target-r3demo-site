@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Most Viewed by Region Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>What’s most viewed in your region · R3 demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../files/bootstrap.min.css">
     <style>
         :root {
@@ -13,21 +18,130 @@
             --netflix-text: #ffffff;
             --netflix-text-muted: #b3b3b3;
         }
-        body { background: var(--netflix-black); color: var(--netflix-text); }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: var(--netflix-black);
+            color: var(--netflix-text);
+            font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        h1.demo-page-title.display-5 {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.28 !important;
+            padding-bottom: 0.1em;
+        }
+        h2.section-title.h5 {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.38 !important;
+            padding-bottom: 0.06em;
+        }
+        .link-know-more {
+            color: var(--netflix-text-muted);
+            background: transparent;
+            border: none;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 255, 255, 0.35);
+            text-underline-offset: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .link-know-more:hover {
+            color: var(--netflix-text);
+            text-decoration-color: rgba(229, 9, 20, 0.85);
+        }
+        .link-know-more:focus-visible {
+            outline: 2px solid var(--netflix-red);
+            outline-offset: 3px;
+        }
+        .demo-sticky-context {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: rgba(20, 20, 20, 0.94);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: none;
+            padding: 0.65rem 0;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            width: 100vw;
+        }
+        .demo-sticky-context .inner {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 12px;
+        }
+        @media (min-width: 576px) {
+            .demo-sticky-context .inner { padding: 0 24px; }
+        }
+        .region-pill-group { gap: 0.25rem; }
+        .region-pill-group .region-pill-btn {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.24rem 0.85rem;
+            line-height: 1.25;
+            border-radius: 4px;
+        }
+        .region-pill-group .btn:focus-visible {
+            outline: 2px solid var(--netflix-red);
+            outline-offset: 2px;
+        }
+        .step-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--netflix-red);
+            border: 1px solid rgba(229, 9, 20, 0.45);
+            padding: 0.2rem 0.45rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            font-family: "Outfit", system-ui, sans-serif;
+        }
         .section-header {
             background: var(--netflix-card);
             border: none;
-            border-bottom: 2px solid var(--netflix-red);
+            border-bottom: none;
             padding: 1rem 1.25rem;
+        }
+        .content-card > .card-header.section-header {
+            border-bottom: none !important;
         }
         .content-card {
             border: 1px solid var(--netflix-card-border);
             border-radius: 8px;
             background: var(--netflix-card);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            scroll-margin-top: 5.5rem;
         }
         .content-card:hover { border-color: #444; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); }
-        #catalog .card {
+        .catalog-scroll-wrap {
+            margin: 0 -0.5rem;
+            padding: 0 0.5rem 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-color: #444 var(--netflix-card);
+        }
+        .catalog-scroll-wrap #catalog,
+        .catalog-scroll-wrap #target-recs-most-viewed-by-region {
+            flex-wrap: nowrap;
+            width: max-content;
+            min-width: 100%;
+            padding-bottom: 0.25rem;
+        }
+        #catalog .card,
+        #target-recs-most-viewed-by-region .card {
+            flex: 0 0 auto;
             min-width: 280px;
             max-width: 280px;
             border: 1px solid var(--netflix-card-border);
@@ -35,24 +149,89 @@
             transition: all 0.3s ease;
             background: var(--netflix-card);
         }
-        #catalog .card:hover {
+        #catalog .card:hover,
+        #catalog .card:focus-within,
+        #target-recs-most-viewed-by-region .card:hover,
+        #target-recs-most-viewed-by-region .card:focus-within {
             transform: translateY(-4px);
             border-color: var(--netflix-red);
             box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2);
         }
-        #catalog .card-img-top {
-            height: 200px;
+        #catalog .catalog-tile-clickable,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable {
+            cursor: pointer;
+            text-align: left;
+            border: none;
+            padding: 0;
+            width: 100%;
+            display: block;
+            color: inherit;
+            font: inherit;
+            text-decoration: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--netflix-card);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #catalog .catalog-tile-clickable:focus,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:focus {
+            outline: none;
+        }
+        #catalog .catalog-tile-clickable:focus-visible,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:focus-visible {
+            outline: 2px solid var(--netflix-red);
+            outline-offset: 3px;
+        }
+        #catalog .catalog-tile-clickable:active,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:active {
+            transform: translateY(-2px);
+        }
+        #catalog .card-img-top,
+        #target-recs-most-viewed-by-region .card-img-top {
+            height: 300px;
             object-fit: cover;
             border-radius: 8px 8px 0 0;
             background: #333;
         }
-        #catalog .card-body { padding: 1rem; color: var(--netflix-text-muted); }
-        #catalog .card-body .text-muted, #catalog .card-body label.small { color: var(--netflix-text-muted) !important; }
-        #catalog .card-title { font-size: 1rem; margin-bottom: 0.5rem; color: var(--netflix-text); font-weight: 600; }
-        #target-recs-most-viewed-by-region .card { min-width: 280px; max-width: 280px; border: 1px solid var(--netflix-card-border); border-radius: 8px; background: var(--netflix-card); }
-        #target-recs-most-viewed-by-region .card-img-top { height: 200px; object-fit: cover; border-radius: 8px 8px 0 0; }
-        #target-recs-most-viewed-by-region .card-body { padding: 1rem; }
-        #target-recs-most-viewed-by-region .card-title { font-size: 1rem; color: var(--netflix-text); font-weight: 600; }
+        #catalog .catalog-tile-body,
+        #target-recs-most-viewed-by-region .catalog-tile-body {
+            padding: 0.85rem 1rem 1rem;
+            color: var(--netflix-text-muted);
+        }
+        #catalog .card-body .text-muted, #catalog .card-body label.small,
+        #target-recs-most-viewed-by-region .card-body .text-muted,
+        #target-recs-most-viewed-by-region .card-body label.small { color: var(--netflix-text-muted) !important; }
+        #catalog .card-title,
+        #target-recs-most-viewed-by-region .card-title {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.42;
+            margin-bottom: 0.35rem;
+            padding-bottom: 0.06em;
+            color: var(--netflix-text);
+            font-weight: 600;
+        }
+        #catalog .catalog-meta,
+        #target-recs-most-viewed-by-region .catalog-meta {
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            margin-bottom: 0;
+            opacity: 0.92;
+        }
+        .recs-panel-wrap { position: relative; min-height: 5rem; }
+        #recs-loading-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 20, 20, 0.55);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        #recs-loading-overlay.is-visible { display: flex; }
         .btn-primary {
             background: var(--netflix-red);
             border: none;
@@ -65,7 +244,6 @@
         .btn-primary:hover { background: var(--netflix-red-hover); color: #fff; }
         .btn-light { background: transparent; border: 1px solid var(--netflix-text-muted); color: var(--netflix-text); font-weight: 600; }
         .btn-light:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
-        .view-count-input { width: 4rem; text-align: center; background: #333; border-color: #555; color: var(--netflix-text); }
         .form-control, .form-select { background: #333; border-color: #555; color: var(--netflix-text); }
         .form-control:focus, .form-select:focus { background: #404040; border-color: var(--netflix-red); box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25); color: #fff; }
         .content-card .card-body { color: var(--netflix-text-muted); }
@@ -75,27 +253,42 @@
         .alert-warning { background: rgba(255, 193, 7, 0.1); border-color: #ffc107; color: var(--netflix-text-muted); }
         .alert-danger { background: rgba(229, 9, 20, 0.2); border-color: var(--netflix-red); color: var(--netflix-text); }
         .text-success { color: #46d369 !important; }
+        .view-event-toast-container {
+            z-index: 1085;
+        }
+        #view-event-toast.toast {
+            font-family: "Source Sans 3", system-ui, sans-serif;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        }
         .btn-outline-secondary { border-color: var(--netflix-text-muted); color: var(--netflix-text); }
         .btn-outline-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
         .text-muted { color: var(--netflix-text-muted) !important; }
+        .collapse.know-more-panel code { word-break: break-word; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            #catalog .card,
+            #catalog .catalog-tile-clickable:active,
+            #target-recs-most-viewed-by-region .card,
+            #target-recs-most-viewed-by-region .catalog-tile-clickable:active {
+                transition: none !important;
+                transform: none !important;
+            }
+        }
     </style>
     <script>
         // Mbox for Most Viewed by Region activity – delivery call creates this location if it doesn't exist yet
         var RECS_MBOX = 'r3demo-most-viewed-by-region-recs';
 
         window.targetGlobalSettings = {
-            clientCode: 'bullseye',
-            serverDomain: 'bullseye.tt.omtrdc.net',
-            // Recs Classic server-side rendering (Target fetches recommendation HTML from
-            // the content service before responding) takes longer than a standard A/B offer.
+            clientCode: 'emeastage3',
+            serverDomain: 'emeastage3.tt-stage1.omtrdc.net',
+            overrideMboxEdgeServer: false,
             timeout: 8000,
-            // Prevent at.js 2.x auto page-load from hiding the body while it tries to
-            // apply VEC modifications from unrelated activities on this account.
-            bodyHidingEnabled: false
-            // NOTE: Target picks the recommendation environment by matching the request
-            // host (context.address.url) in Admin > Administration > Hosts.
-            // Ensure this host is mapped to "r3demo-environment" (186425).
+            bodyHidingEnabled: false,
+            cookieDomain: window.location.hostname
         };
+
+        console.log('cookieDomain: ' + window.location.hostname);
 
         // OTT catalog – matches entities-feed-ott.csv
         var CATALOG = [
@@ -121,11 +314,40 @@
             { id: 'ott-020', name: 'Final Run', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Action', type: 'movie' }
         ];
 
-        function getViewCountFor(entityId) {
-            var el = document.querySelector('[data-entity-id="' + entityId + '"] .view-count-input');
-            if (!el) return 1;
-            var n = parseInt(el.value, 10);
-            return isNaN(n) || n < 1 ? 1 : Math.min(n, 50);
+        function setRecsLoadingVisible(show) {
+            var overlay = document.getElementById('recs-loading-overlay');
+            if (!overlay) return;
+            if (show) {
+                overlay.classList.add('is-visible');
+            } else {
+                overlay.classList.remove('is-visible');
+            }
+        }
+
+        function updateRecsSectionRegionLabel() {
+            var el = document.getElementById('recs-section-region-label');
+            if (el) {
+                el.textContent = getSelectedRegion();
+            }
+        }
+
+        function syncRegionPills() {
+            var v = getSelectedRegion();
+            document.querySelectorAll('[data-region-pill]').forEach(function (btn) {
+                var val = btn.getAttribute('data-region-value');
+                var isSel = val === v;
+                btn.classList.toggle('btn-primary', isSel);
+                btn.classList.toggle('btn-outline-secondary', !isSel);
+                btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+            });
+            updateRecsSectionRegionLabel();
+        }
+
+        function selectRegion(region) {
+            var sel = document.getElementById('region-select');
+            if (sel) sel.value = region;
+            syncRegionPills();
+            refreshRecommendations();
         }
 
         function viewItemOnce(item, done) {
@@ -145,26 +367,35 @@
             });
         }
 
+        function showViewToast(message, isError) {
+            var toastEl = document.getElementById('view-event-toast');
+            var body = document.getElementById('view-event-toast-body');
+            if (!toastEl || !body) return;
+            body.textContent = message;
+            toastEl.classList.remove('text-bg-dark', 'text-bg-danger', 'border-secondary', 'border-danger');
+            if (isError) {
+                toastEl.classList.add('text-bg-danger', 'border-danger');
+            } else {
+                toastEl.classList.add('text-bg-dark', 'border-secondary');
+            }
+            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                var t = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000, autohide: true });
+                t.show();
+            } else {
+                window.alert(message);
+            }
+        }
+
         function viewItem(entityId) {
             if (typeof adobe === 'undefined' || !adobe.target) {
-                updateLastAction('Target at.js not loaded. Cannot send view events.');
+                showViewToast('Target at.js not loaded. Cannot send view events.', true);
                 return;
             }
             var item = CATALOG.find(function (m) { return m.id === entityId; });
             if (!item) return;
-            var count = getViewCountFor(entityId);
-            var idx = 0;
-            function next() {
-                if (idx >= count) {
-                    updateLastAction('Recorded ' + count + ' view(s) for ' + item.name + '.');
-                    return;
-                }
-                viewItemOnce(item, function () {
-                    idx++;
-                    setTimeout(next, 200);
-                });
-            }
-            next();
+            viewItemOnce(item, function () {
+                showViewToast('View event generated for "' + item.name + '"', false);
+            });
         }
 
         function getSelectedRegion() {
@@ -188,7 +419,12 @@
             var container = document.getElementById('target-recs-most-viewed-by-region');
             if (!container) return;
 
-            if (!assertTargetLoaded(container)) return;
+            if (!assertTargetLoaded(container)) {
+                setRecsLoadingVisible(false);
+                return;
+            }
+
+            setRecsLoadingVisible(true);
 
             var region = getSelectedRegion();
             container.style.opacity = '0.3';
@@ -205,6 +441,7 @@
                         console.log('[Recs] offer:', offer);
                     }
                     if (offerLooksLikeClickOnly(offer)) {
+                        setRecsLoadingVisible(false);
                         container.style.transition = 'opacity 2s ease-in';
                         container.style.opacity = '1';
                         container.innerHTML =
@@ -215,6 +452,7 @@
                     }
                     adobe.target.applyOffer({ mbox: RECS_MBOX, selector: '#target-recs-most-viewed-by-region', offer: offer });
                     setTimeout(function () {
+                        setRecsLoadingVisible(false);
                         container.style.transition = 'opacity 2s ease-in';
                         container.style.opacity = '1';
                         var html = (container.innerHTML || '').trim();
@@ -227,6 +465,7 @@
                 },
                 error: function (err) {
                     console.warn('[Recs] getOffer error:', err);
+                    setRecsLoadingVisible(false);
                     container.style.transition = 'opacity 2s ease-in';
                     container.style.opacity = '1';
                     container.innerHTML = '<div class="alert alert-danger mb-0">getOffer failed for mbox <code>' + RECS_MBOX + '</code>. Check console (F12).</div>';
@@ -234,29 +473,17 @@
             });
         }
 
-        function updateLastAction(msg) {
-            var el = document.getElementById('last-action');
-            if (el) {
-                el.textContent = msg;
-                el.style.visibility = 'visible';
-            }
-        }
-
         function renderCatalog() {
             var container = document.getElementById('catalog');
             if (!container) return;
             container.innerHTML = CATALOG.map(function (item) {
-                return '<div class="card text-center" data-entity-id="' + item.id + '">' +
-                    '<img src="../files/images/' + item.id + '.jpg" class="card-img-top" alt="' + item.name + '">' +
-                    '<div class="card-body">' +
+                var label = 'Generate view event for ' + item.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+                return '<button type="button" class="card catalog-tile catalog-tile-clickable" data-entity-id="' + item.id + '" onclick="viewItem(\'' + item.id + '\')" aria-label="' + label + '">' +
+                    '<img src="../files/images/' + item.id + '.jpg" class="card-img-top" alt="">' +
+                    '<div class="card-body catalog-tile-body">' +
                     '<h6 class="card-title">' + item.name + '</h6>' +
-                    '<p class="small text-muted mb-1">' + item.genre + ' · ' + item.type + '</p>' +
-                    '<div class="mb-2">' +
-                    '<label class="small text-muted">Views</label>' +
-                    '<input type="number" class="form-control form-control-sm view-count-input mx-auto" value="1" min="1" max="50" title="Number of view events">' +
-                    '</div>' +
-                    '<button type="button" class="btn btn-primary btn-sm w-100" onclick="viewItem(\'' + item.id + '\')">View</button>' +
-                    '</div></div>';
+                    '<p class="catalog-meta text-muted mb-0">' + item.genre + ' · ' + item.type + '</p>' +
+                    '</div></button>';
             }).join('');
         }
 
@@ -272,6 +499,7 @@
         window.addEventListener('DOMContentLoaded', function () {
             var label = document.getElementById('recs-mbox-label');
             if (label) label.textContent = RECS_MBOX;
+            syncRegionPills();
             renderCatalog();
             setTimeout(refreshRecommendations, 1000);
         });
@@ -279,44 +507,69 @@
 </head>
 <body>
     <button type="button" id="nonConversionClickTrackSelector" class="visually-hidden" tabindex="-1" aria-hidden="true">Target metric</button>
-    <div class="container py-5">
-        <div class="text-center mb-4">
-            <h1 class="display-5 fw-bold" style="color: var(--netflix-text);">Most Viewed by Region</h1>
-            <p class="text-muted small">Recommendations grouped by region. The page sends mbox param <code>recsRegion</code> on <code>item-view-mbox</code> and the recs mbox below. In Target, profile script <code>recsAttributeRegion</code> can be <code>return mbox.param("recsRegion");</code> (align with your Recs “profile attribute” key).</p>
-            <div class="mt-3 d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                <label class="text-muted small mb-0">Region:</label>
-                <select id="region-select" class="form-select form-select-sm" style="width: auto; min-width: 120px;" onchange="refreshRecommendations()" title="Sent as mbox param recsRegion">
-                    <option value="US" selected>US</option>
-                    <option value="INDIA">INDIA</option>
-                    <option value="UK">UK</option>
-                </select>
-                <span class="text-muted small">(used for views + recs)</span>
+    <div class="container py-3 py-md-4">
+        <header class="text-center mb-2">
+            <h1 class="display-5 demo-page-title mb-0" style="color: var(--netflix-text);">What’s most viewed in your region</h1>
+            <button class="link-know-more mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#know-more" aria-expanded="false" aria-controls="know-more">Know more</button>
+            <div id="know-more" class="collapse text-start know-more-panel mt-2">
+                <div class="small text-muted mx-auto border border-secondary border-opacity-25 rounded-3 p-3" style="max-width: 40rem;">
+                    <p class="mb-2"><strong class="text-light">Using this page</strong> — Changing region reloads the most-viewed list below. Click a title to generate a view event for the selected region. The list shows popular titles for that region (aggregated across visitors)—not personalized to you.</p>
+                    <p class="mb-2"><strong class="text-light">How this demo works</strong> — Pick a region, simulate catalog views, then load a <strong class="text-light">most viewed</strong> list for that region (based on aggregated views, not a personal “for you” feed).</p>
+                    <p class="mb-2">View events and the recommendation request both send the mbox parameter <code>recsRegion</code>.</p>
+                    <p class="mb-2"><strong class="text-light">Step 1 — Catalog</strong> — Each title click generates a view event on <code>item-view-mbox</code> with <code>entity.*</code> and the current <code>recsRegion</code>.</p>
+                    <p class="mb-2"><strong class="text-light">Step 2 — Recommendations</strong> — The recs panel calls Target with mbox <code id="recs-mbox-label"></code> to surface what’s most viewed for <code>recsRegion</code>. The region from the sticky bar is passed as <code>recsRegion</code>.</p>
+                    <p class="mb-0"><strong class="text-light">Target setup</strong> — Recommendations are grouped by region. In Target, profile script <code>recsAttributeRegion</code> can be <code>return mbox.param("recsRegion");</code> (align with your Recs profile attribute key). Add <code>?recsDebug=1</code> to the URL to log the raw offer in the console.</p>
+                </div>
             </div>
-        </div>
+        </header>
+
+        <nav class="demo-sticky-context mb-3" aria-label="Region and most viewed list">
+            <div class="inner">
+                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-md-3">
+                    <span class="text-muted small fw-semibold mb-0">Region</span>
+                    <div class="btn-group region-pill-group" role="group" aria-label="Region for recsRegion">
+                        <button type="button" class="btn btn-sm btn-primary region-pill-btn" data-region-pill data-region-value="US" onclick="selectRegion('US')" aria-pressed="true">US</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary region-pill-btn" data-region-pill data-region-value="INDIA" onclick="selectRegion('INDIA')" aria-pressed="false">INDIA</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary region-pill-btn" data-region-pill data-region-value="UK" onclick="selectRegion('UK')" aria-pressed="false">UK</button>
+                    </div>
+                    <label class="visually-hidden" for="region-select">Region (synced with buttons)</label>
+                    <select id="region-select" class="visually-hidden" onchange="syncRegionPills(); refreshRecommendations();" title="Sent as mbox param recsRegion">
+                        <option value="US" selected>US</option>
+                        <option value="INDIA">INDIA</option>
+                        <option value="UK">UK</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
 
         <div class="card mb-4 content-card">
             <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0">OTT catalog</h2>
+                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 1</span>Browse titles</h2>
             </div>
             <div class="card-body">
-                <p class="small text-muted mb-3">
-                    Click <strong>View</strong> to send view events (mbox: <code>item-view-mbox</code>) with <code>entity.*</code> and <code>recsRegion</code> (current region from above).
-                </p>
-                <div id="last-action" class="small text-success mb-2" style="visibility: hidden;"></div>
-                <div id="catalog" class="d-flex flex-wrap" style="gap: 20px;"></div>
+                <div class="catalog-scroll-wrap">
+                    <div id="catalog" class="d-flex" style="gap: 20px;"></div>
+                </div>
             </div>
         </div>
 
         <div class="card content-card mb-4">
-            <div class="card-header section-header text-white d-flex justify-content-between align-items-center flex-wrap" style="gap: 0.5rem;">
-                <h2 class="h5 mb-0">Most Viewed by Region - Recommendations</h2>
-                <button type="button" onclick="refreshRecommendations()" class="btn btn-light btn-sm">🔄 Refresh</button>
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 2</span>Most viewed in <span id="recs-section-region-label">US</span></h2>
             </div>
             <div class="card-body">
-                <p class="small text-muted mb-3">Recs from Target (mbox: <code id="recs-mbox-label"></code>). Uses the region selected at the top, passed as mbox param <code>recsRegion</code>.</p>
-                <div id="target-recs-most-viewed-by-region" class="d-flex flex-wrap" style="gap: 20px;">
-                    <div class="alert alert-info mb-0">
-                        <strong>Loading…</strong> Configure a Most Viewed by Region activity with mbox <code>r3demo-most-viewed-by-region-recs</code> to see recommendations here.
+                <div class="recs-panel-wrap">
+                    <div id="recs-loading-overlay" class="recs-loading-overlay" aria-hidden="true">
+                        <div class="spinner-border text-light" role="status" style="width: 2.5rem; height: 2.5rem;">
+                            <span class="visually-hidden">Loading recommendations</span>
+                        </div>
+                    </div>
+                    <div class="catalog-scroll-wrap">
+                    <div id="target-recs-most-viewed-by-region" class="d-flex position-relative" style="gap: 20px;">
+                        <div class="alert alert-info mb-0">
+                            <strong>Loading…</strong> Configure a Most Viewed by Region activity with mbox <code>r3demo-most-viewed-by-region-recs</code> to see recommendations here.
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -326,7 +579,14 @@
             <a href="../index.html" class="btn btn-outline-secondary">← Back to Home</a>
         </div>
     </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 view-event-toast-container">
+        <div id="view-event-toast" class="toast text-bg-dark border border-secondary" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+            <div class="toast-body py-2 px-3" id="view-event-toast-body"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../scripts/at.js"></script>
+    <script src="../scripts/emeastage3-at.js"></script>
 </body>
 </html>
