@@ -135,9 +135,32 @@
         .catalog-scroll-wrap #catalog,
         .catalog-scroll-wrap #target-recs-most-viewed-by-region {
             flex-wrap: nowrap;
+            flex-direction: row;
             width: max-content;
             min-width: 100%;
             padding-bottom: 0.25rem;
+        }
+        /* Recs strip: Bootstrap .card uses width:100%; that forces one tile per row. Pin horizontal row + tile width. */
+        #target-recs-most-viewed-by-region {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch;
+        }
+        #target-recs-most-viewed-by-region > .card,
+        #target-recs-most-viewed-by-region > a.card {
+            --bs-card-width: auto;
+            width: auto !important;
+            max-width: 280px;
+            min-width: 280px;
+            flex: 0 0 auto;
+        }
+        /* If the Velocity template wraps tiles in a flex row, keep it horizontal */
+        #target-recs-most-viewed-by-region > .d-flex {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: max-content !important;
+            min-width: 100%;
         }
         #catalog .card,
         #target-recs-most-viewed-by-region .card {
@@ -157,13 +180,29 @@
             border-color: var(--netflix-red);
             box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2);
         }
-        #catalog .catalog-tile-clickable,
-        #target-recs-most-viewed-by-region .catalog-tile-clickable {
+        #catalog .catalog-tile-clickable {
             cursor: pointer;
             text-align: left;
             border: none;
             padding: 0;
             width: 100%;
+            display: block;
+            color: inherit;
+            font: inherit;
+            text-decoration: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--netflix-card);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #target-recs-most-viewed-by-region .catalog-tile-clickable {
+            cursor: pointer;
+            text-align: left;
+            border: none;
+            padding: 0;
+            width: auto;
+            max-width: 280px;
             display: block;
             color: inherit;
             font: inherit;
