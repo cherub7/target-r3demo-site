@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>What’s most viewed in your region · R3 demo</title>
+    <title>What’s trending · R3 demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -62,39 +62,142 @@
             outline: 2px solid var(--netflix-red);
             outline-offset: 3px;
         }
-        .demo-sticky-context {
+
+        /* ── TENFLIX top nav ── */
+        .tenflix-topbar {
             position: sticky;
             top: 0;
-            z-index: 1030;
-            background: rgba(20, 20, 20, 0.94);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: none;
-            padding: 0.65rem 0;
+            z-index: 1040;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.5rem;
+            background: rgba(20, 20, 20, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
             margin-left: calc(50% - 50vw);
             margin-right: calc(50% - 50vw);
             width: 100vw;
         }
-        .demo-sticky-context .inner {
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 0 12px;
+        .tenflix-logo {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.04em;
+            color: var(--netflix-red);
+            text-decoration: none;
+            line-height: 1;
+            flex-shrink: 0;
         }
-        @media (min-width: 576px) {
-            .demo-sticky-context .inner { padding: 0 24px; }
+        .tenflix-logo:hover { color: var(--netflix-red-hover); text-decoration: none; }
+
+        /* ── Persona switcher ── */
+        .persona-switcher-wrap {
+            position: relative;
+            z-index: 10;
         }
-        .region-pill-group { gap: 0.25rem; }
-        .region-pill-group .region-pill-btn {
-            font-size: 0.75rem;
+        .persona-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(24, 24, 24, 0.92);
+            border: 1px solid #444;
+            border-radius: 24px;
+            padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+            cursor: pointer;
+            color: var(--netflix-text);
+            font-family: "Source Sans 3", system-ui, sans-serif;
+            font-size: 0.875rem;
             font-weight: 600;
-            padding: 0.24rem 0.85rem;
-            line-height: 1.25;
-            border-radius: 4px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: border-color 0.2s, background 0.2s;
         }
-        .region-pill-group .btn:focus-visible {
-            outline: 2px solid var(--netflix-red);
-            outline-offset: 2px;
+        .persona-trigger:hover { border-color: #666; background: rgba(40,40,40,0.96); }
+        .persona-trigger:focus-visible { outline: 2px solid var(--netflix-red); outline-offset: 2px; }
+        .persona-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            font-family: "Outfit", system-ui, sans-serif;
+            letter-spacing: 0.02em;
         }
+        .persona-trigger .persona-avatar { width: 26px; height: 26px; }
+        .persona-chevron {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .persona-switcher-wrap.is-open .persona-chevron { transform: rotate(180deg); }
+        .persona-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 200px;
+            background: #1f1f1f;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+            overflow: hidden;
+        }
+        .persona-switcher-wrap.is-open .persona-dropdown { display: block; }
+        .persona-dropdown-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--netflix-text-muted);
+            padding: 0.65rem 1rem 0.35rem;
+        }
+        .persona-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            color: var(--netflix-text);
+            font-family: inherit;
+        }
+        .persona-dropdown-item:hover { background: rgba(255,255,255,0.06); }
+        .persona-dropdown-item.is-active { background: rgba(229,9,20,0.12); }
+        .persona-dropdown-item.is-active .persona-item-name { color: #fff; }
+        .persona-item-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--netflix-text-muted);
+        }
+        .persona-item-region {
+            font-size: 0.72rem;
+            color: var(--netflix-text-muted);
+            opacity: 0.75;
+            margin-top: 1px;
+        }
+        .persona-item-check {
+            margin-left: auto;
+            width: 14px;
+            height: 14px;
+            color: var(--netflix-red);
+            opacity: 0;
+        }
+        .persona-dropdown-item.is-active .persona-item-check { opacity: 1; }
+        .persona-dropdown-divider { height: 1px; background: #2e2e2e; margin: 0.25rem 0; }
         .step-badge {
             font-size: 0.6rem;
             font-weight: 700;
@@ -122,7 +225,7 @@
             border-radius: 8px;
             background: var(--netflix-card);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            scroll-margin-top: 5.5rem;
+            scroll-margin-top: 4rem;
         }
         .content-card:hover { border-color: #444; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); }
         .catalog-scroll-wrap {
@@ -303,6 +406,42 @@
         .btn-outline-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
         .text-muted { color: var(--netflix-text-muted) !important; }
         .collapse.know-more-panel code { word-break: break-word; }
+        /* ── Know more (bottom) ── */
+        .know-more-details {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1rem;
+        }
+        .know-more-summary {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--netflix-text-muted);
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            user-select: none;
+        }
+        .know-more-summary::-webkit-details-marker { display: none; }
+        .know-more-summary::before {
+            content: '›';
+            font-size: 1rem;
+            line-height: 1;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        details.know-more-details[open] .know-more-summary::before { transform: rotate(90deg); }
+        .know-more-summary:hover { color: var(--netflix-text); }
+        .know-more-body {
+            margin-top: 0.65rem;
+            font-size: 0.75rem;
+            color: var(--netflix-text-muted);
+            line-height: 1.55;
+            max-width: 48rem;
+        }
+        .know-more-body strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+        .know-more-body code { background: #2a2a2a; color: var(--netflix-red); padding: 0.15em 0.35em; border-radius: 3px; font-size: 0.72rem; }
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
             #catalog .card,
@@ -353,56 +492,78 @@
             { id: 'ott-020', name: 'Final Run', categoryId: 'r3demo-ott-movies', value: '4.99', genre: 'Action', type: 'movie' }
         ];
 
-        function setRecsLoadingVisible(show) {
-            var overlay = document.getElementById('recs-loading-overlay');
-            if (!overlay) return;
-            if (show) {
-                overlay.classList.add('is-visible');
-            } else {
-                overlay.classList.remove('is-visible');
-            }
+        // ── Personas ──────────────────────────────────────────────────────
+        var PERSONAS = [
+            { id: 'michael', name: 'Michael', region: 'US',    regionLabel: 'United States', color: '#1d6eb5', initial: 'M' },
+            { id: 'neeraj',  name: 'Neeraj',  region: 'INDIA', regionLabel: 'India',         color: '#16873a', initial: 'N' },
+            { id: 'chris',   name: 'Chris',   region: 'UK',    regionLabel: 'United Kingdom',color: '#7c3aed', initial: 'C' }
+        ];
+        var _activePersonaId = 'michael';
+
+        function getActivePersona() {
+            return PERSONAS.find(function (p) { return p.id === _activePersonaId; }) || PERSONAS[0];
         }
 
-        function updateRecsSectionRegionLabel() {
-            var el = document.getElementById('recs-section-region-label');
-            if (el) {
-                el.textContent = getSelectedRegion();
-            }
+        function getSelectedRegion() {
+            return getActivePersona().region;
         }
 
-        function syncRegionPills() {
-            var v = getSelectedRegion();
-            document.querySelectorAll('[data-region-pill]').forEach(function (btn) {
-                var val = btn.getAttribute('data-region-value');
-                var isSel = val === v;
-                btn.classList.toggle('btn-primary', isSel);
-                btn.classList.toggle('btn-outline-secondary', !isSel);
-                btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
-            });
-            updateRecsSectionRegionLabel();
-        }
-
-        function selectRegion(region) {
-            var sel = document.getElementById('region-select');
-            if (sel) sel.value = region;
-            syncRegionPills();
+        function selectPersona(id) {
+            _activePersonaId = id;
+            syncPersonaUI();
+            closePersonaDropdown();
             refreshRecommendations();
         }
 
+        function syncPersonaUI() {
+            var p = getActivePersona();
+
+            // Trigger button
+            var triggerAvatar = document.getElementById('persona-trigger-avatar');
+            var triggerName   = document.getElementById('persona-trigger-name');
+            if (triggerAvatar) { triggerAvatar.textContent = p.initial; triggerAvatar.style.background = p.color; }
+            if (triggerName)   triggerName.textContent = p.name;
+
+            // Dropdown items active state
+            document.querySelectorAll('[data-persona-id]').forEach(function (el) {
+                el.classList.toggle('is-active', el.getAttribute('data-persona-id') === p.id);
+            });
+        }
+
+        function togglePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.toggle('is-open');
+        }
+
+        function closePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.remove('is-open');
+        }
+
+        // Close on outside click
+        document.addEventListener('click', function (e) {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap && !wrap.contains(e.target)) closePersonaDropdown();
+        });
+
+        // ── Loading overlay ────────────────────────────────────────────────
+        function setRecsLoadingVisible(show) {
+            var overlay = document.getElementById('recs-loading-overlay');
+            if (!overlay) return;
+            overlay.classList.toggle('is-visible', show);
+        }
+
+        // ── View events ────────────────────────────────────────────────────
         function viewItemOnce(item, done) {
             if (typeof adobe === 'undefined' || !adobe.target) {
                 if (done) done();
                 return;
             }
-            var params = {
-                'entity.id': item.id,
-                'recsRegion': getSelectedRegion()
-            };
             adobe.target.trackEvent({
                 mbox: 'item-view-mbox',
-                params: params,
+                params: { 'entity.id': item.id, 'recsRegion': getSelectedRegion() },
                 success: function () { if (done) done(); },
-                error: function () { if (done) done(); }
+                error:   function () { if (done) done(); }
             });
         }
 
@@ -418,8 +579,7 @@
                 toastEl.classList.add('text-bg-dark', 'border-secondary');
             }
             if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-                var t = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000, autohide: true });
-                t.show();
+                bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000, autohide: true }).show();
             } else {
                 window.alert(message);
             }
@@ -437,11 +597,7 @@
             });
         }
 
-        function getSelectedRegion() {
-            var el = document.getElementById('region-select');
-            return el ? el.value : 'US';
-        }
-
+        // ── Target helpers ─────────────────────────────────────────────────
         function assertTargetLoaded(container) {
             if (typeof adobe === 'undefined' || !adobe.target) {
                 if (container) {
@@ -464,17 +620,13 @@
             }
 
             setRecsLoadingVisible(true);
-
-            var region = getSelectedRegion();
             container.style.opacity = '0.3';
             container.style.transition = 'opacity 0.3s ease-out';
 
             adobe.target.getOffer({
                 mbox: RECS_MBOX,
                 selector: '#target-recs-most-viewed-by-region',
-                params: {
-                    recsRegion: region
-                },
+                params: { recsRegion: getSelectedRegion() },
                 success: function (offer) {
                     if (window.location.search.indexOf('recsDebug=1') !== -1) {
                         console.log('[Recs] offer:', offer);
@@ -495,7 +647,7 @@
                         container.style.transition = 'opacity 2s ease-in';
                         container.style.opacity = '1';
                         var html = (container.innerHTML || '').trim();
-                        var hasContent = html.length > 50 && html.indexOf('Loading…') === -1 && html.indexOf('signalClick') === -1;
+                        var hasContent = html.length > 50 && html.indexOf('Loading\u2026') === -1 && html.indexOf('signalClick') === -1;
                         if (!hasContent) {
                             container.innerHTML =
                                 '<div class="alert alert-warning mb-0">No recommendation HTML was applied. Inspect the activity offer for <code>' + RECS_MBOX + '</code> or use <code>?recsDebug=1</code>.</div>';
@@ -536,9 +688,22 @@
         }
 
         window.addEventListener('DOMContentLoaded', function () {
-            var label = document.getElementById('recs-mbox-label');
-            if (label) label.textContent = RECS_MBOX;
-            syncRegionPills();
+            var mboxLabel = document.getElementById('recs-mbox-label');
+            if (mboxLabel) mboxLabel.textContent = RECS_MBOX;
+
+            // Build persona dropdown items dynamically
+            var list = document.getElementById('persona-dropdown-list');
+            if (list) {
+                list.innerHTML = PERSONAS.map(function (p) {
+                    return '<button type="button" class="persona-dropdown-item" data-persona-id="' + p.id + '" onclick="selectPersona(\'' + p.id + '\')">' +
+                        '<span class="persona-avatar" style="background:' + p.color + '">' + p.initial + '</span>' +
+                        '<div><div class="persona-item-name">' + p.name + '</div><div class="persona-item-region">' + p.regionLabel + '</div></div>' +
+                        '<svg class="persona-item-check" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>' +
+                        '</button>';
+                }).join('');
+            }
+
+            syncPersonaUI();
             renderCatalog();
             setTimeout(refreshRecommendations, 1000);
         });
@@ -546,41 +711,24 @@
 </head>
 <body>
     <button type="button" id="nonConversionClickTrackSelector" class="visually-hidden" tabindex="-1" aria-hidden="true">Target metric</button>
+
+    <!-- TENFLIX top nav -->
+    <nav class="tenflix-topbar">
+        <a href="../index.html" class="tenflix-logo" aria-label="Tenflix home">TENFLIX</a>
+        <div class="persona-switcher-wrap" id="persona-switcher-wrap" aria-label="Switch profile">
+            <button class="persona-trigger" id="persona-trigger" onclick="togglePersonaDropdown()" aria-haspopup="listbox" aria-expanded="false">
+                <span class="persona-avatar" id="persona-trigger-avatar" style="background:#1d6eb5">M</span>
+                <span class="persona-name" id="persona-trigger-name">Michael</span>
+                <svg class="persona-chevron" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+            <div class="persona-dropdown" id="persona-dropdown" role="listbox">
+                <div class="persona-dropdown-label">Switch profile</div>
+                <div id="persona-dropdown-list"></div>
+            </div>
+        </div>
+    </nav>
+
     <div class="container py-3 py-md-4">
-        <header class="text-center mb-2">
-            <h1 class="display-5 demo-page-title mb-0" style="color: var(--netflix-text);">What’s most viewed in your region</h1>
-            <button class="link-know-more mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#know-more" aria-expanded="false" aria-controls="know-more">Know more</button>
-            <div id="know-more" class="collapse text-start know-more-panel mt-2">
-                <div class="small text-muted mx-auto border border-secondary border-opacity-25 rounded-3 p-3" style="max-width: 40rem;">
-                    <p class="mb-2"><strong class="text-light">Using this page</strong> — Changing region reloads the most-viewed list below. Click a title to generate a view event for the selected region. The list shows popular titles for that region (aggregated across visitors)—not personalized to you.</p>
-                    <p class="mb-2"><strong class="text-light">How this demo works</strong> — Pick a region, simulate catalog views, then load a <strong class="text-light">most viewed</strong> list for that region (based on aggregated views, not a personal “for you” feed).</p>
-                    <p class="mb-2">View events and the recommendation request both send the mbox parameter <code>recsRegion</code>.</p>
-                    <p class="mb-2"><strong class="text-light">Step 1 — Catalog</strong> — Each title click generates a view event on <code>item-view-mbox</code> with <code>entity.*</code> and the current <code>recsRegion</code>.</p>
-                    <p class="mb-2"><strong class="text-light">Step 2 — Recommendations</strong> — The recs panel calls Target with mbox <code id="recs-mbox-label"></code> to surface what’s most viewed for <code>recsRegion</code>. The region from the sticky bar is passed as <code>recsRegion</code>.</p>
-                    <p class="mb-0"><strong class="text-light">Target setup</strong> — Recommendations are grouped by region. In Target, profile script <code>recsAttributeRegion</code> can be <code>return mbox.param("recsRegion");</code> (align with your Recs profile attribute key). Add <code>?recsDebug=1</code> to the URL to log the raw offer in the console.</p>
-                </div>
-            </div>
-        </header>
-
-        <nav class="demo-sticky-context mb-3" aria-label="Region and most viewed list">
-            <div class="inner">
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-md-3">
-                    <span class="text-muted small fw-semibold mb-0">Region</span>
-                    <div class="btn-group region-pill-group" role="group" aria-label="Region for recsRegion">
-                        <button type="button" class="btn btn-sm btn-primary region-pill-btn" data-region-pill data-region-value="US" onclick="selectRegion('US')" aria-pressed="true">US</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary region-pill-btn" data-region-pill data-region-value="INDIA" onclick="selectRegion('INDIA')" aria-pressed="false">INDIA</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary region-pill-btn" data-region-pill data-region-value="UK" onclick="selectRegion('UK')" aria-pressed="false">UK</button>
-                    </div>
-                    <label class="visually-hidden" for="region-select">Region (synced with buttons)</label>
-                    <select id="region-select" class="visually-hidden" onchange="syncRegionPills(); refreshRecommendations();" title="Sent as mbox param recsRegion">
-                        <option value="US" selected>US</option>
-                        <option value="INDIA">INDIA</option>
-                        <option value="UK">UK</option>
-                    </select>
-                </div>
-            </div>
-        </nav>
-
         <div class="card mb-4 content-card">
             <div class="card-header section-header text-white">
                 <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 1</span>Browse titles</h2>
@@ -594,7 +742,7 @@
 
         <div class="card content-card mb-4">
             <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 2</span>Most viewed in <span id="recs-section-region-label">US</span></h2>
+                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 2</span>Popular in your region</h2>
             </div>
             <div class="card-body">
                 <div class="recs-panel-wrap">
@@ -614,8 +762,19 @@
             </div>
         </div>
 
-        <div class="mt-4 text-center">
-            <a href="../index.html" class="btn btn-outline-secondary">← Back to Home</a>
+        <div class="mt-5 pt-2">
+            <details class="know-more-details">
+                <summary class="know-more-summary">How this demo works</summary>
+                <div class="know-more-body">
+                    <p class="mb-2"><strong>Profiles</strong> — Michael (US), Neeraj (India), Chris (UK). Switching profile reloads recommendations with <code>recsRegion</code> set to that region.</p>
+                    <p class="mb-2"><strong>Step 1 — Catalog</strong> — Each title click sends a view event on <code>item-view-mbox</code> with <code>entity.*</code> and <code>recsRegion</code> for the active profile.</p>
+                    <p class="mb-2"><strong>Step 2 — Recommendations</strong> — Calls Target mbox <code id="recs-mbox-label"></code> with <code>recsRegion</code> to surface what’s most viewed for that region.</p>
+                    <p class="mb-0"><strong>Target setup</strong> — Profile script <code>recsAttributeRegion</code>: <code>return mbox.param("recsRegion");</code>. Add <code>?recsDebug=1</code> to log raw offers.</p>
+                </div>
+            </details>
+            <div class="mt-3 text-center">
+                <a href="../index.html" class="btn btn-outline-secondary">← Back to Home</a>
+            </div>
         </div>
     </div>
 
