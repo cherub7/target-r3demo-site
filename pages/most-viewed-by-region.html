@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>What’s trending · R3 demo</title>
+    <title>Tenflix</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -406,11 +406,46 @@
         .btn-outline-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
         .text-muted { color: var(--netflix-text-muted) !important; }
         .collapse.know-more-panel code { word-break: break-word; }
-        /* ── Know more (bottom) ── */
-        .know-more-details {
+        /* ── Recs section title crossfade ── */
+        #recs-section-title {
+            transition: opacity 0.35s ease;
+            display: inline;
+        }
+        #recs-section-title.fading { opacity: 0; }
+
+        /* ── Bottom meta row (know-more + settings side by side) ── */
+        .bottom-meta {
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 1rem;
         }
+        .bottom-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 0.5rem;
+        }
+        .know-more-details {
+            flex: 0 0 auto;
+        }
+        /* Both panels: open content floats below without shifting the summary */
+        .know-more-details {
+            position: relative;
+        }
+        .know-more-details .know-more-body {
+            position: absolute;
+            top: calc(100% + 6px);
+            min-width: 260px;
+            background: #1f1f1f;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+            z-index: 20;
+        }
+        /* How this demo works opens to the right, Settings opens to the left */
+        .know-more-details:first-child .know-more-body { left: 0; max-width: 36rem; }
+        .settings-details .know-more-body { right: 0; min-width: 260px; }
         .know-more-summary {
             font-size: 0.78rem;
             font-weight: 600;
@@ -434,14 +469,69 @@
         details.know-more-details[open] .know-more-summary::before { transform: rotate(90deg); }
         .know-more-summary:hover { color: var(--netflix-text); }
         .know-more-body {
-            margin-top: 0.65rem;
+            margin-top: 0;
             font-size: 0.75rem;
             color: var(--netflix-text-muted);
             line-height: 1.55;
-            max-width: 48rem;
         }
         .know-more-body strong { color: rgba(255,255,255,0.75); font-weight: 600; }
         .know-more-body code { background: #2a2a2a; color: var(--netflix-red); padding: 0.15em 0.35em; border-radius: 3px; font-size: 0.72rem; }
+
+        /* ── Settings toggle ── */
+        .settings-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-top: 0.65rem;
+        }
+        .settings-toggle-track {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .settings-toggle-track.is-on { background: var(--netflix-red); }
+        #region-toggle {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .settings-toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            pointer-events: none;
+        }
+        .settings-toggle-track.is-on .settings-toggle-thumb { transform: translateX(16px); }
+        .settings-toggle-label-text {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--netflix-text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .settings-toggle-desc {
+            margin-top: 0.45rem;
+            font-size: 0.72rem;
+            color: var(--netflix-text-muted);
+            opacity: 0.75;
+            line-height: 1.45;
+        }
+        .settings-toggle-desc code { background: #2a2a2a; color: var(--netflix-red); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.68rem; }
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
             #catalog .card,
@@ -499,6 +589,27 @@
             { id: 'chris',   name: 'Chris',   region: 'UK',    regionLabel: 'United Kingdom',color: '#7c3aed', initial: 'C' }
         ];
         var _activePersonaId = 'michael';
+        var _regionEnabled = false; // toggle starts OFF
+
+        function isRegionEnabled() { return _regionEnabled; }
+
+        function crossfadeRecsTitle(newText) {
+            var el = document.getElementById('recs-section-title');
+            if (!el) return;
+            el.classList.add('fading');
+            setTimeout(function () {
+                el.textContent = newText;
+                el.classList.remove('fading');
+            }, 350);
+        }
+
+        function setRegionEnabled(enabled) {
+            _regionEnabled = enabled;
+            var track = document.getElementById('region-toggle-track');
+            if (track) track.classList.toggle('is-on', enabled);
+            crossfadeRecsTitle(enabled ? 'Popular in your region' : 'Popular titles');
+            refreshRecommendations();
+        }
 
         function getActivePersona() {
             return PERSONAS.find(function (p) { return p.id === _activePersonaId; }) || PERSONAS[0];
@@ -623,10 +734,11 @@
             container.style.opacity = '0.3';
             container.style.transition = 'opacity 0.3s ease-out';
 
+            var offerParams = isRegionEnabled() ? { recsRegion: getSelectedRegion() } : {};
             adobe.target.getOffer({
                 mbox: RECS_MBOX,
                 selector: '#target-recs-most-viewed-by-region',
-                params: { recsRegion: getSelectedRegion() },
+                params: offerParams,
                 success: function (offer) {
                     if (window.location.search.indexOf('recsDebug=1') !== -1) {
                         console.log('[Recs] offer:', offer);
@@ -731,7 +843,7 @@
     <div class="container py-3 py-md-4">
         <div class="card mb-4 content-card">
             <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 1</span>Browse titles</h2>
+                <h2 class="h5 mb-0 section-title">Browse titles</h2>
             </div>
             <div class="card-body">
                 <div class="catalog-scroll-wrap">
@@ -742,7 +854,7 @@
 
         <div class="card content-card mb-4">
             <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0 section-title"><span class="step-badge">Step 2</span>Popular in your region</h2>
+                <h2 class="h5 mb-0 section-title"><span id="recs-section-title">Popular titles</span></h2>
             </div>
             <div class="card-body">
                 <div class="recs-panel-wrap">
@@ -762,21 +874,33 @@
             </div>
         </div>
 
-        <div class="mt-5 pt-2">
-            <details class="know-more-details">
-                <summary class="know-more-summary">How this demo works</summary>
-                <div class="know-more-body">
-                    <p class="mb-2"><strong>Profiles</strong> — Michael (US), Neeraj (India), Chris (UK). Switching profile reloads recommendations with <code>recsRegion</code> set to that region.</p>
-                    <p class="mb-2"><strong>Step 1 — Catalog</strong> — Each title click sends a view event on <code>item-view-mbox</code> with <code>entity.*</code> and <code>recsRegion</code> for the active profile.</p>
-                    <p class="mb-2"><strong>Step 2 — Recommendations</strong> — Calls Target mbox <code id="recs-mbox-label"></code> with <code>recsRegion</code> to surface what’s most viewed for that region.</p>
-                    <p class="mb-0"><strong>Target setup</strong> — Profile script <code>recsAttributeRegion</code>: <code>return mbox.param("recsRegion");</code>. Add <code>?recsDebug=1</code> to log raw offers.</p>
-                </div>
-            </details>
-            <div class="mt-3 text-center">
-                <a href="../index.html" class="btn btn-outline-secondary">← Back to Home</a>
+        <div class="mt-5 pt-2 pb-4 bottom-meta">
+            <div class="bottom-meta-row">
+                <details class="know-more-details">
+                    <summary class="know-more-summary">How this demo works</summary>
+                    <div class="know-more-body">
+                        <p class="mb-2"><strong>Profiles</strong> — Michael (US), Neeraj (India), Chris (UK). Switching profile changes the active region.</p>
+                        <p class="mb-2"><strong>Catalog</strong> — Each title click sends a view event on <code>item-view-mbox</code> with <code>entity.*</code> and <code>recsRegion</code> for the active profile.</p>
+                        <p class="mb-2"><strong>Recommendations</strong> — Calls Target mbox <code id="recs-mbox-label"></code>. When region personalisation is on, <code>recsRegion</code> is sent to surface region-specific results.</p>
+                        <p class="mb-0"><strong>Target setup</strong> — Profile script <code>recsAttributeRegion</code>: <code>return mbox.param("recsRegion");</code>. Add <code>?recsDebug=1</code> to log raw offers.</p>
+                    </div>
+                </details>
+
+                <details class="know-more-details settings-details">
+                    <summary class="know-more-summary">Settings</summary>
+                    <div class="know-more-body">
+                        <div class="settings-toggle-row">
+                            <label class="settings-toggle-track" id="region-toggle-track" for="region-toggle">
+                                <input type="checkbox" id="region-toggle" role="switch" onchange="setRegionEnabled(this.checked)">
+                                <span class="settings-toggle-thumb"></span>
+                            </label>
+                            <label class="settings-toggle-label-text" for="region-toggle">Personalise by region</label>
+                        </div>
+                        <p class="settings-toggle-desc">When enabled, sends <code>recsRegion</code> with the recommendation request. The section title and results update to reflect the active profile’s region.</p>
+                    </div>
+                </details>
             </div>
         </div>
-    </div>
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3 view-event-toast-container">
         <div id="view-event-toast" class="toast text-bg-dark border border-secondary" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
