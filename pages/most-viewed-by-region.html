@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tenflix</title>
+    <title>Testflix</title>
+    <link rel="icon" href="../files/images/testflix-favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -63,8 +64,8 @@
             outline-offset: 3px;
         }
 
-        /* ── TENFLIX top nav ── */
-        .tenflix-topbar {
+        /* ── TESTFLIX top nav ── */
+        .testflix-topbar {
             position: sticky;
             top: 0;
             z-index: 1040;
@@ -80,7 +81,7 @@
             margin-right: calc(50% - 50vw);
             width: 100vw;
         }
-        .tenflix-logo {
+        .testflix-logo {
             font-family: "Outfit", system-ui, sans-serif;
             font-weight: 700;
             font-size: 1.6rem;
@@ -90,7 +91,7 @@
             line-height: 1;
             flex-shrink: 0;
         }
-        .tenflix-logo:hover { color: var(--netflix-red-hover); text-decoration: none; }
+        .testflix-logo:hover { color: var(--netflix-red-hover); text-decoration: none; }
 
         /* ── Persona switcher ── */
         .persona-switcher-wrap {
@@ -611,7 +612,7 @@
             _regionEnabled = enabled;
             var track = document.getElementById('region-toggle-track');
             if (track) track.classList.toggle('is-on', enabled);
-            crossfadeRecsTitle(enabled ? 'Popular in your region' : 'Popular titles');
+            crossfadeRecsTitle(enabled ? 'Popular titles in your region' : 'Popular titles');
             var mboxLabel = document.getElementById('recs-mbox-label');
             if (mboxLabel) mboxLabel.textContent = getRecsMbox();
             refreshRecommendations();
@@ -831,9 +832,9 @@
 <body>
     <button type="button" id="nonConversionClickTrackSelector" class="visually-hidden" tabindex="-1" aria-hidden="true">Target metric</button>
 
-    <!-- TENFLIX top nav -->
-    <nav class="tenflix-topbar">
-        <a href="../index.html" class="tenflix-logo" aria-label="Tenflix home">TENFLIX</a>
+    <!-- TESTFLIX top nav -->
+    <nav class="testflix-topbar">
+        <a href="../index.html" class="testflix-logo" aria-label="Testflix home">TESTFLIX</a>
         <div class="persona-switcher-wrap" id="persona-switcher-wrap" aria-label="Switch profile">
             <button class="persona-trigger" id="persona-trigger" onclick="togglePersonaDropdown()" aria-haspopup="listbox" aria-expanded="false">
                 <span class="persona-avatar" id="persona-trigger-avatar" style="background:#1d6eb5">M</span>
