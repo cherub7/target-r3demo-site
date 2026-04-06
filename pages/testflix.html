@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Testflix</title>
+    <link rel="icon" href="../files/images/testflix-favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../files/bootstrap.min.css">
+    <style>
+        :root {
+            --netflix-red: #E50914;
+            --netflix-red-hover: #f40612;
+            --netflix-black: #141414;
+            --netflix-card: #181818;
+            --netflix-card-border: #333;
+            --netflix-text: #ffffff;
+            --netflix-text-muted: #b3b3b3;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: var(--netflix-black);
+            color: var(--netflix-text);
+            font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        h1.demo-page-title.display-5 {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.28 !important;
+            padding-bottom: 0.1em;
+        }
+        h2.section-title.h5 {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.38 !important;
+            padding-bottom: 0.06em;
+        }
+        .link-know-more {
+            color: var(--netflix-text-muted);
+            background: transparent;
+            border: none;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 255, 255, 0.35);
+            text-underline-offset: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .link-know-more:hover {
+            color: var(--netflix-text);
+            text-decoration-color: rgba(229, 9, 20, 0.85);
+        }
+        .link-know-more:focus-visible {
+            outline: 2px solid var(--netflix-red);
+            outline-offset: 3px;
+        }
+
+        /* ── TESTFLIX top nav ── */
+        .testflix-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.5rem;
+            background: rgba(20, 20, 20, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            width: 100vw;
+        }
+        .testflix-logo {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.04em;
+            color: var(--netflix-red);
+            text-decoration: none;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .testflix-logo:hover { color: var(--netflix-red-hover); text-decoration: none; }
+
+        /* ── Persona switcher ── */
+        .persona-switcher-wrap {
+            position: relative;
+            z-index: 10;
+        }
+        .persona-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(24, 24, 24, 0.92);
+            border: 1px solid #444;
+            border-radius: 24px;
+            padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+            cursor: pointer;
+            color: var(--netflix-text);
+            font-family: "Source Sans 3", system-ui, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .persona-trigger:hover { border-color: #666; background: rgba(40,40,40,0.96); }
+        .persona-trigger:focus-visible { outline: 2px solid var(--netflix-red); outline-offset: 2px; }
+        .persona-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            font-family: "Outfit", system-ui, sans-serif;
+            letter-spacing: 0.02em;
+        }
+        .persona-trigger .persona-avatar { width: 26px; height: 26px; }
+        .persona-chevron {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .persona-switcher-wrap.is-open .persona-chevron { transform: rotate(180deg); }
+        .persona-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 200px;
+            background: #1f1f1f;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+            overflow: hidden;
+        }
+        .persona-switcher-wrap.is-open .persona-dropdown { display: block; }
+        .persona-dropdown-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--netflix-text-muted);
+            padding: 0.65rem 1rem 0.35rem;
+        }
+        .persona-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            color: var(--netflix-text);
+            font-family: inherit;
+        }
+        .persona-dropdown-item:hover { background: rgba(255,255,255,0.06); }
+        .persona-dropdown-item.is-active { background: rgba(229,9,20,0.12); }
+        .persona-dropdown-item.is-active .persona-item-name { color: #fff; }
+        .persona-item-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--netflix-text-muted);
+        }
+        .persona-item-region {
+            font-size: 0.72rem;
+            color: var(--netflix-text-muted);
+            opacity: 0.75;
+            margin-top: 1px;
+        }
+        .persona-item-check {
+            margin-left: auto;
+            width: 14px;
+            height: 14px;
+            color: var(--netflix-red);
+            opacity: 0;
+        }
+        .persona-dropdown-item.is-active .persona-item-check { opacity: 1; }
+        .persona-dropdown-divider { height: 1px; background: #2e2e2e; margin: 0.25rem 0; }
+        .step-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--netflix-red);
+            border: 1px solid rgba(229, 9, 20, 0.45);
+            padding: 0.2rem 0.45rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            font-family: "Outfit", system-ui, sans-serif;
+        }
+        .section-header {
+            background: var(--netflix-card);
+            border: none;
+            border-bottom: none;
+            padding: 1rem 1.25rem;
+        }
+        .content-card > .card-header.section-header {
+            border-bottom: none !important;
+        }
+        .content-card {
+            border: 1px solid var(--netflix-card-border);
+            border-radius: 8px;
+            background: var(--netflix-card);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            scroll-margin-top: 4rem;
+        }
+        .content-card:hover { border-color: #444; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); }
+        .catalog-scroll-wrap {
+            margin: 0 -0.5rem;
+            padding: 0 0.5rem 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-color: #444 var(--netflix-card);
+        }
+        .catalog-scroll-wrap #catalog,
+        .catalog-scroll-wrap #target-recs-most-viewed-by-region {
+            flex-wrap: nowrap;
+            flex-direction: row;
+            width: max-content;
+            min-width: 100%;
+            padding-bottom: 0.25rem;
+        }
+        /* Recs strip: Bootstrap .card uses width:100%; that forces one tile per row. Pin horizontal row + tile width. */
+        #target-recs-most-viewed-by-region {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch;
+        }
+        #target-recs-most-viewed-by-region > .card,
+        #target-recs-most-viewed-by-region > a.card {
+            --bs-card-width: auto;
+            width: auto !important;
+            max-width: 280px;
+            min-width: 280px;
+            flex: 0 0 auto;
+        }
+        /* If the Velocity template wraps tiles in a flex row, keep it horizontal */
+        #target-recs-most-viewed-by-region > .d-flex {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: max-content !important;
+            min-width: 100%;
+        }
+        #catalog .card,
+        #target-recs-most-viewed-by-region .card {
+            flex: 0 0 auto;
+            min-width: 280px;
+            max-width: 280px;
+            border: 1px solid var(--netflix-card-border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: var(--netflix-card);
+        }
+        #catalog .card:hover,
+        #catalog .card:focus-within,
+        #target-recs-most-viewed-by-region .card:hover,
+        #target-recs-most-viewed-by-region .card:focus-within {
+            transform: translateY(-4px);
+            border-color: var(--netflix-red);
+            box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2);
+        }
+        #catalog .catalog-tile-clickable {
+            cursor: pointer;
+            text-align: left;
+            border: none;
+            padding: 0;
+            width: 100%;
+            display: block;
+            color: inherit;
+            font: inherit;
+            text-decoration: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--netflix-card);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #target-recs-most-viewed-by-region .catalog-tile-clickable {
+            cursor: pointer;
+            text-align: left;
+            border: none;
+            padding: 0;
+            width: auto;
+            max-width: 280px;
+            display: block;
+            color: inherit;
+            font: inherit;
+            text-decoration: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--netflix-card);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #catalog .catalog-tile-clickable:focus,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:focus {
+            outline: none;
+        }
+        #catalog .catalog-tile-clickable:focus-visible,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:focus-visible {
+            outline: 2px solid var(--netflix-red);
+            outline-offset: 3px;
+        }
+        #catalog .catalog-tile-clickable:active,
+        #target-recs-most-viewed-by-region .catalog-tile-clickable:active {
+            transform: translateY(-2px);
+        }
+        #catalog .card-img-top,
+        #target-recs-most-viewed-by-region .card-img-top {
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            background: #333;
+        }
+        #catalog .catalog-tile-body,
+        #target-recs-most-viewed-by-region .catalog-tile-body {
+            padding: 0.85rem 1rem 1rem;
+            color: var(--netflix-text-muted);
+        }
+        #catalog .card-body .text-muted, #catalog .card-body label.small,
+        #target-recs-most-viewed-by-region .card-body .text-muted,
+        #target-recs-most-viewed-by-region .card-body label.small { color: var(--netflix-text-muted) !important; }
+        #catalog .card-title,
+        #target-recs-most-viewed-by-region .card-title {
+            font-family: "Outfit", system-ui, sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.42;
+            margin-bottom: 0.35rem;
+            padding-bottom: 0.06em;
+            color: var(--netflix-text);
+            font-weight: 600;
+        }
+        #catalog .catalog-meta,
+        #target-recs-most-viewed-by-region .catalog-meta {
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            margin-bottom: 0;
+            opacity: 0.92;
+        }
+        .recs-panel-wrap { position: relative; min-height: 5rem; }
+        #recs-loading-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 20, 20, 0.55);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        #recs-loading-overlay.is-visible { display: flex; }
+        .btn-primary {
+            background: var(--netflix-red);
+            border: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--netflix-red-hover); color: #fff; }
+        .btn-light { background: transparent; border: 1px solid var(--netflix-text-muted); color: var(--netflix-text); font-weight: 600; }
+        .btn-light:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
+        .form-control, .form-select { background: #333; border-color: #555; color: var(--netflix-text); }
+        .form-control:focus, .form-select:focus { background: #404040; border-color: var(--netflix-red); box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25); color: #fff; }
+        .content-card .card-body { color: var(--netflix-text-muted); }
+        .content-card .card-body .text-muted, .content-card .card-body p.small { color: var(--netflix-text-muted) !important; }
+        .content-card .card-body code { background: #333; color: var(--netflix-red); padding: 0.2em 0.4em; border-radius: 4px; }
+        .alert-info { background: rgba(229, 9, 20, 0.15); border-color: var(--netflix-red); color: var(--netflix-text); }
+        .alert-warning { background: rgba(255, 193, 7, 0.1); border-color: #ffc107; color: var(--netflix-text-muted); }
+        .alert-danger { background: rgba(229, 9, 20, 0.2); border-color: var(--netflix-red); color: var(--netflix-text); }
+        .text-success { color: #46d369 !important; }
+        .view-event-toast-container {
+            z-index: 1085;
+        }
+        #view-event-toast.toast {
+            font-family: "Source Sans 3", system-ui, sans-serif;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        }
+        .btn-outline-secondary { border-color: var(--netflix-text-muted); color: var(--netflix-text); }
+        .btn-outline-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--netflix-text); color: var(--netflix-text); }
+        .text-muted { color: var(--netflix-text-muted) !important; }
+        .collapse.know-more-panel code { word-break: break-word; }
+        /* ── Recs section title crossfade ── */
+        #recs-section-title {
+            transition: opacity 0.35s ease;
+            display: inline;
+        }
+        #recs-section-title.fading { opacity: 0; }
+
+        /* ── Bottom meta row (know-more + settings side by side) ── */
+        .bottom-meta {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1rem;
+        }
+        .bottom-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 0.5rem;
+        }
+        .know-more-details {
+            flex: 0 0 auto;
+        }
+        /* Both panels: open content floats below without shifting the summary */
+        .know-more-details {
+            position: relative;
+        }
+        .know-more-details .know-more-body {
+            position: absolute;
+            top: calc(100% + 6px);
+            min-width: 260px;
+            background: #1f1f1f;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+            z-index: 20;
+        }
+        /* How this demo works opens to the right, Settings opens to the left */
+        .know-more-details:first-child .know-more-body { left: 0; max-width: 36rem; }
+        .settings-details .know-more-body { right: 0; min-width: 260px; }
+        .know-more-summary {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--netflix-text-muted);
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            user-select: none;
+        }
+        .know-more-summary::-webkit-details-marker { display: none; }
+        .know-more-summary::before {
+            content: '›';
+            font-size: 1rem;
+            line-height: 1;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        details.know-more-details[open] .know-more-summary::before { transform: rotate(90deg); }
+        .know-more-summary:hover { color: var(--netflix-text); }
+        .know-more-body {
+            margin-top: 0;
+            font-size: 0.75rem;
+            color: var(--netflix-text-muted);
+            line-height: 1.55;
+        }
+        .know-more-body strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+        .know-more-body code { background: #2a2a2a; color: var(--netflix-red); padding: 0.15em 0.35em; border-radius: 3px; font-size: 0.72rem; }
+
+        /* ── Settings toggle ── */
+        .settings-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-top: 0.65rem;
+        }
+        .settings-toggle-track {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .settings-toggle-track.is-on { background: var(--netflix-red); }
+        #region-toggle {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .settings-toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            pointer-events: none;
+        }
+        .settings-toggle-track.is-on .settings-toggle-thumb { transform: translateX(16px); }
+        .settings-toggle-label-text {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--netflix-text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .settings-toggle-desc {
+            margin-top: 0.45rem;
+            font-size: 0.72rem;
+            color: var(--netflix-text-muted);
+            opacity: 0.75;
+            line-height: 1.45;
+        }
+        .settings-toggle-desc code { background: #2a2a2a; color: var(--netflix-red); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.68rem; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            #catalog .card,
+            #catalog .catalog-tile-clickable:active,
+            #target-recs-most-viewed-by-region .card,
+            #target-recs-most-viewed-by-region .catalog-tile-clickable:active {
+                transition: none !important;
+                transform: none !important;
+            }
+        }
+    </style>
+    <script>
+        var RECS_MBOX_GLOBAL = 'testflix-most-viewed-recs';
+        var RECS_MBOX_REGION = 'testflix-most-viewed-by-region-recs';
+
+        function getRecsMbox() {
+            return isRegionEnabled() ? RECS_MBOX_REGION : RECS_MBOX_GLOBAL;
+        }
+
+        window.targetGlobalSettings = {
+            clientCode: 'emeastage3',
+            serverDomain: 'emeastage3.tt-stage1.omtrdc.net',
+            overrideMboxEdgeServer: false,
+            timeout: 8000,
+            bodyHidingEnabled: false,
+            cookieDomain: window.location.hostname
+        };
+
+        console.log('cookieDomain: ' + window.location.hostname);
+
+        // OTT catalog - matches entities-feed-testflix.csv
+        var CATALOG = [
+            { id: 'testflix-001', name: 'Dune: Part Two', categoryId: 'cat-sci-fi', genre: 'Sci-Fi', type: 'movie' },
+            { id: 'testflix-002', name: 'Oppenheimer', categoryId: 'cat-drama', genre: 'Drama', type: 'movie' },
+            { id: 'testflix-003', name: 'The Bear', categoryId: 'cat-drama', genre: 'Drama', type: 'series' },
+            { id: 'testflix-004', name: 'Reacher', categoryId: 'cat-action', genre: 'Action', type: 'series' },
+            { id: 'testflix-005', name: 'Stranger Things', categoryId: 'cat-sci-fi', genre: 'Sci-Fi', type: 'series' },
+            { id: 'testflix-006', name: 'The Crown', categoryId: 'cat-drama', genre: 'Drama', type: 'series' },
+            { id: 'testflix-007', name: 'Peaky Blinders', categoryId: 'cat-crime', genre: 'Crime', type: 'series' },
+            { id: 'testflix-008', name: 'Top Boy', categoryId: 'cat-crime', genre: 'Crime', type: 'series' },
+            { id: 'testflix-009', name: 'Sherlock', categoryId: 'cat-mystery', genre: 'Mystery', type: 'series' },
+            { id: 'testflix-010', name: 'Jawan', categoryId: 'cat-action', genre: 'Action', type: 'movie' },
+            { id: 'testflix-011', name: 'Pathaan', categoryId: 'cat-action', genre: 'Action', type: 'movie' },
+            { id: 'testflix-012', name: 'RRR', categoryId: 'cat-action', genre: 'Action', type: 'movie' },
+            { id: 'testflix-013', name: 'Farzi', categoryId: 'cat-crime', genre: 'Crime', type: 'series' },
+            { id: 'testflix-014', name: 'Mirzapur', categoryId: 'cat-crime', genre: 'Crime', type: 'series' },
+            { id: 'testflix-015', name: 'The Family Man', categoryId: 'cat-thriller', genre: 'Thriller', type: 'series' },
+            { id: 'testflix-016', name: 'Wednesday', categoryId: 'cat-fantasy', genre: 'Fantasy', type: 'series' },
+            { id: 'testflix-017', name: 'Avatar: The Way of Water', categoryId: 'cat-sci-fi', genre: 'Sci-Fi', type: 'movie' },
+            { id: 'testflix-018', name: 'The Gentlemen', categoryId: 'cat-crime', genre: 'Crime', type: 'series' },
+            { id: 'testflix-019', name: 'Avengers: Endgame', categoryId: 'cat-action', genre: 'Action', type: 'movie' },
+            { id: 'testflix-020', name: 'Kalki 2898 AD', categoryId: 'cat-sci-fi', genre: 'Sci-Fi', type: 'movie' }
+        ];
+
+        // ── Personas ──────────────────────────────────────────────────────
+        var PERSONAS = [
+            { id: 'michael', name: 'Michael', region: 'US',    regionLabel: 'United States', color: '#1d6eb5', initial: 'M' },
+            { id: 'neeraj',  name: 'Neeraj',  region: 'INDIA', regionLabel: 'India',         color: '#16873a', initial: 'N' },
+            { id: 'chris',   name: 'Chris',   region: 'UK',    regionLabel: 'United Kingdom',color: '#7c3aed', initial: 'C' }
+        ];
+        var _activePersonaId = 'michael';
+        var _regionEnabled = false; // toggle starts OFF
+
+        function isRegionEnabled() { return _regionEnabled; }
+
+        function crossfadeRecsTitle(newText) {
+            var el = document.getElementById('recs-section-title');
+            if (!el) return;
+            el.classList.add('fading');
+            setTimeout(function () {
+                el.textContent = newText;
+                el.classList.remove('fading');
+            }, 350);
+        }
+
+        function setRegionEnabled(enabled) {
+            _regionEnabled = enabled;
+            var track = document.getElementById('region-toggle-track');
+            if (track) track.classList.toggle('is-on', enabled);
+            crossfadeRecsTitle(enabled ? 'Popular titles in your region' : 'Popular titles');
+            var mboxLabel = document.getElementById('recs-mbox-label');
+            if (mboxLabel) mboxLabel.textContent = getRecsMbox();
+            refreshRecommendations();
+        }
+
+        function getActivePersona() {
+            return PERSONAS.find(function (p) { return p.id === _activePersonaId; }) || PERSONAS[0];
+        }
+
+        function getSelectedRegion() {
+            return getActivePersona().region;
+        }
+
+        function selectPersona(id) {
+            _activePersonaId = id;
+            syncPersonaUI();
+            closePersonaDropdown();
+            refreshRecommendations();
+        }
+
+        function syncPersonaUI() {
+            var p = getActivePersona();
+
+            // Trigger button
+            var triggerAvatar = document.getElementById('persona-trigger-avatar');
+            var triggerName   = document.getElementById('persona-trigger-name');
+            if (triggerAvatar) { triggerAvatar.textContent = p.initial; triggerAvatar.style.background = p.color; }
+            if (triggerName)   triggerName.textContent = p.name;
+
+            // Dropdown items active state
+            document.querySelectorAll('[data-persona-id]').forEach(function (el) {
+                el.classList.toggle('is-active', el.getAttribute('data-persona-id') === p.id);
+            });
+        }
+
+        function togglePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.toggle('is-open');
+        }
+
+        function closePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.remove('is-open');
+        }
+
+        // Close on outside click
+        document.addEventListener('click', function (e) {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap && !wrap.contains(e.target)) closePersonaDropdown();
+        });
+
+        // ── Loading overlay ────────────────────────────────────────────────
+        function setRecsLoadingVisible(show) {
+            var overlay = document.getElementById('recs-loading-overlay');
+            if (!overlay) return;
+            overlay.classList.toggle('is-visible', show);
+        }
+
+        // ── View events ────────────────────────────────────────────────────
+        function viewItemOnce(item, done) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                if (done) done();
+                return;
+            }
+            adobe.target.trackEvent({
+                mbox: 'item-view-mbox',
+                params: { 'entity.id': item.id, 'recsRegion': getSelectedRegion() },
+                success: function () { if (done) done(); },
+                error:   function () { if (done) done(); }
+            });
+        }
+
+        function showViewToast(message, isError) {
+            var toastEl = document.getElementById('view-event-toast');
+            var body = document.getElementById('view-event-toast-body');
+            if (!toastEl || !body) return;
+            body.textContent = message;
+            toastEl.classList.remove('text-bg-dark', 'text-bg-danger', 'border-secondary', 'border-danger');
+            if (isError) {
+                toastEl.classList.add('text-bg-danger', 'border-danger');
+            } else {
+                toastEl.classList.add('text-bg-dark', 'border-secondary');
+            }
+            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000, autohide: true }).show();
+            } else {
+                window.alert(message);
+            }
+        }
+
+        function viewItem(entityId) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                showViewToast('Target at.js not loaded. Cannot send view events.', true);
+                return;
+            }
+            var item = CATALOG.find(function (m) { return m.id === entityId; });
+            if (!item) return;
+            viewItemOnce(item, function () {
+                showViewToast('View event generated for "' + item.name + '"', false);
+            });
+        }
+
+        // ── Target helpers ─────────────────────────────────────────────────
+        function assertTargetLoaded(container) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                if (container) {
+                    container.innerHTML =
+                        '<div class="alert alert-danger mb-0">Target at.js not loaded. ' +
+                        'Check <code>../scripts/at.js</code> path and Network tab.</div>';
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function refreshRecommendations() {
+            var container = document.getElementById('target-recs-most-viewed-by-region');
+            if (!container) return;
+
+            if (!assertTargetLoaded(container)) {
+                setRecsLoadingVisible(false);
+                return;
+            }
+
+            setRecsLoadingVisible(true);
+            container.style.opacity = '0.3';
+            container.style.transition = 'opacity 0.3s ease-out';
+
+            var mbox = getRecsMbox();
+            var offerParams = isRegionEnabled() ? { recsRegion: getSelectedRegion() } : {};
+            adobe.target.getOffer({
+                mbox: mbox,
+                selector: '#target-recs-most-viewed-by-region',
+                params: offerParams,
+                success: function (offer) {
+                    if (window.location.search.indexOf('recsDebug=1') !== -1) {
+                        console.log('[Recs] mbox=' + mbox, 'offer:', offer);
+                    }
+                    if (offerLooksLikeClickOnly(offer)) {
+                        setRecsLoadingVisible(false);
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity = '1';
+                        container.innerHTML =
+                            '<div class="alert alert-warning mb-0">Target returned only click-tracking actions (<code>signalClick</code>), not recommendation HTML. ' +
+                            'Check the activity template for <code>' + mbox + '</code> and that the design renders entity HTML. ' +
+                            'Add <code>?recsDebug=1</code> to log the raw offer to the console.</div>';
+                        return;
+                    }
+                    adobe.target.applyOffer({ mbox: mbox, selector: '#target-recs-most-viewed-by-region', offer: offer });
+                    setTimeout(function () {
+                        setRecsLoadingVisible(false);
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity = '1';
+                        var html = (container.innerHTML || '').trim();
+                        var hasContent = html.length > 50 && html.indexOf('Loading\u2026') === -1 && html.indexOf('signalClick') === -1;
+                        if (!hasContent) {
+                            container.innerHTML =
+                                '<div class="alert alert-warning mb-0">No recommendation HTML was applied. Inspect the activity offer for <code>' + mbox + '</code> or use <code>?recsDebug=1</code>.</div>';
+                        }
+                    }, 200);
+                },
+                error: function (err) {
+                    console.warn('[Recs] getOffer error, mbox=' + mbox, err);
+                    setRecsLoadingVisible(false);
+                    container.style.transition = 'opacity 2s ease-in';
+                    container.style.opacity = '1';
+                    container.innerHTML = '<div class="alert alert-danger mb-0">getOffer failed for mbox <code>' + mbox + '</code>. Check console (F12).</div>';
+                }
+            });
+        }
+
+        function renderCatalog() {
+            var container = document.getElementById('catalog');
+            if (!container) return;
+            container.innerHTML = CATALOG.map(function (item) {
+                var label = 'Generate view event for ' + item.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+                return '<button type="button" class="card catalog-tile catalog-tile-clickable" data-entity-id="' + item.id + '" onclick="viewItem(\'' + item.id + '\')" aria-label="' + label + '">' +
+                    '<img src="../files/images/' + item.id + '.jpg" class="card-img-top" alt="">' +
+                    '<div class="card-body catalog-tile-body">' +
+                    '<h6 class="card-title">' + item.name + '</h6>' +
+                    '<p class="catalog-meta text-muted mb-0">' + item.genre + ' · ' + item.type + '</p>' +
+                    '</div></button>';
+            }).join('');
+        }
+
+        function offerLooksLikeClickOnly(offer) {
+            if (!offer) return true;
+            var list = Array.isArray(offer) ? offer : [offer];
+            if (list.length === 0) return true;
+            return list.every(function (a) {
+                return a && (a.action === 'signalClick' || a.action === 'click');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            var mboxLabel = document.getElementById('recs-mbox-label');
+            if (mboxLabel) mboxLabel.textContent = getRecsMbox();
+
+            // Build persona dropdown items dynamically
+            var list = document.getElementById('persona-dropdown-list');
+            if (list) {
+                list.innerHTML = PERSONAS.map(function (p) {
+                    return '<button type="button" class="persona-dropdown-item" data-persona-id="' + p.id + '" onclick="selectPersona(\'' + p.id + '\')">' +
+                        '<span class="persona-avatar" style="background:' + p.color + '">' + p.initial + '</span>' +
+                        '<div><div class="persona-item-name">' + p.name + '</div><div class="persona-item-region">' + p.regionLabel + '</div></div>' +
+                        '<svg class="persona-item-check" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>' +
+                        '</button>';
+                }).join('');
+            }
+
+            syncPersonaUI();
+            renderCatalog();
+            setTimeout(refreshRecommendations, 1000);
+        });
+    </script>
+</head>
+<body>
+    <button type="button" id="nonConversionClickTrackSelector" class="visually-hidden" tabindex="-1" aria-hidden="true">Target metric</button>
+
+    <!-- TESTFLIX top nav -->
+    <nav class="testflix-topbar">
+        <a href="../index.html" class="testflix-logo" aria-label="Testflix home">TESTFLIX</a>
+        <div class="persona-switcher-wrap" id="persona-switcher-wrap" aria-label="Switch profile">
+            <button class="persona-trigger" id="persona-trigger" onclick="togglePersonaDropdown()" aria-haspopup="listbox" aria-expanded="false">
+                <span class="persona-avatar" id="persona-trigger-avatar" style="background:#1d6eb5">M</span>
+                <span class="persona-name" id="persona-trigger-name">Michael</span>
+                <svg class="persona-chevron" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+            <div class="persona-dropdown" id="persona-dropdown" role="listbox">
+                <div class="persona-dropdown-label">Switch profile</div>
+                <div id="persona-dropdown-list"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-3 py-md-4">
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0 section-title">Browse titles</h2>
+            </div>
+            <div class="card-body">
+                <div class="catalog-scroll-wrap">
+                    <div id="catalog" class="d-flex" style="gap: 20px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card content-card mb-4">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0 section-title"><span id="recs-section-title">Popular titles</span></h2>
+            </div>
+            <div class="card-body">
+                <div class="recs-panel-wrap">
+                    <div id="recs-loading-overlay" class="recs-loading-overlay" aria-hidden="true">
+                        <div class="spinner-border text-light" role="status" style="width: 2.5rem; height: 2.5rem;">
+                            <span class="visually-hidden">Loading recommendations</span>
+                        </div>
+                    </div>
+                    <div class="catalog-scroll-wrap">
+                    <div id="target-recs-most-viewed-by-region" class="d-flex position-relative" style="gap: 20px;">
+                        <div class="alert alert-info mb-0">
+                            <strong>Loading…</strong> Configure a Most Viewed by Region activity with mbox <code>testflix-most-viewed-by-region-recs</code> to see recommendations here.
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-2 pb-4 bottom-meta">
+            <div class="bottom-meta-row">
+                <details class="know-more-details">
+                    <summary class="know-more-summary">How this demo works</summary>
+                    <div class="know-more-body">
+                        <p class="mb-2"><strong>Profiles</strong> — Michael (US), Neeraj (India), Chris (UK). Switching profile changes the active region.</p>
+                        <p class="mb-2"><strong>Catalog</strong> — Each title click sends a view event on <code>item-view-mbox</code> with <code>entity.*</code> and <code>recsRegion</code> for the active profile.</p>
+                        <p class="mb-2"><strong>Recommendations</strong> — Calls Target mbox <code id="recs-mbox-label"></code>. When region personalisation is on, <code>recsRegion</code> is sent to surface region-specific results.</p>
+                        <p class="mb-0"><strong>Target setup</strong> — Profile script <code>recsAttributeRegion</code>: <code>return mbox.param("recsRegion");</code>. Add <code>?recsDebug=1</code> to log raw offers.</p>
+                    </div>
+                </details>
+
+                <details class="know-more-details settings-details">
+                    <summary class="know-more-summary">Settings</summary>
+                    <div class="know-more-body">
+                        <div class="settings-toggle-row">
+                            <label class="settings-toggle-track" id="region-toggle-track" for="region-toggle">
+                                <input type="checkbox" id="region-toggle" role="switch" onchange="setRegionEnabled(this.checked)">
+                                <span class="settings-toggle-thumb"></span>
+                            </label>
+                            <label class="settings-toggle-label-text" for="region-toggle">Personalise by region</label>
+                        </div>
+                        <p class="settings-toggle-desc">When enabled, sends <code>recsRegion</code> with the recommendation request. The section title and results update to reflect the active profile’s region.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 view-event-toast-container">
+        <div id="view-event-toast" class="toast text-bg-dark border border-secondary" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+            <div class="toast-body py-2 px-3" id="view-event-toast-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/emeastage3-at.js"></script>
+</body>
+</html>

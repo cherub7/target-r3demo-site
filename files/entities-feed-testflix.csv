@@ -1,0 +1,25 @@
+## RECSRecommendations Upload File
+## RECS''## RECS'' indicates a Recommendations pre-process header. Please do not remove these lines.
+## RECS
+## RECSOTT catalog: movies and series. entity.custom1 = genre, entity.custom2 = type (movie|series).
+## RECSentity.id,entity.name,entity.categoryId,entity.message,entity.thumbnailUrl,entity.value,entity.pageUrl,entity.inventory,entity.margin,entity.custom1,entity.custom2,entity.custom3,entity.custom4,entity.custom5,entity.custom6,entity.custom7,entity.custom8,entity.custom9,entity.custom10
+testflix-001,Dune: Part Two,cat-sci-fi,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-001.jpg,,,,,Sci-Fi,movie,,,,,,,,,,
+testflix-002,Oppenheimer,cat-drama,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-002.jpg,,,,,Drama,movie,,,,,,,,,,
+testflix-003,The Bear,cat-drama,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-003.jpg,,,,,Drama,series,,,,,,,,,,
+testflix-004,Reacher,cat-action,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-004.jpg,,,,,Action,series,,,,,,,,,,
+testflix-005,Stranger Things,cat-sci-fi,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-005.jpg,,,,,Sci-Fi,series,,,,,,,,,,
+testflix-006,The Crown,cat-drama,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-006.jpg,,,,,Drama,series,,,,,,,,,,
+testflix-007,Peaky Blinders,cat-crime,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-007.jpg,,,,,Crime,series,,,,,,,,,,
+testflix-008,Top Boy,cat-crime,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-008.jpg,,,,,Crime,series,,,,,,,,,,
+testflix-009,Sherlock,cat-mystery,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-009.jpg,,,,,Mystery,series,,,,,,,,,,
+testflix-010,Jawan,cat-action,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-010.jpg,,,,,Action,movie,,,,,,,,,,
+testflix-011,Pathaan,cat-action,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-011.jpg,,,,,Action,movie,,,,,,,,,,
+testflix-012,RRR,cat-action,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-012.jpg,,,,,Action,movie,,,,,,,,,,
+testflix-013,Farzi,cat-crime,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-013.jpg,,,,,Crime,series,,,,,,,,,,
+testflix-014,Mirzapur,cat-crime,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-014.jpg,,,,,Crime,series,,,,,,,,,,
+testflix-015,The Family Man,cat-thriller,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-015.jpg,,,,,Thriller,series,,,,,,,,,,
+testflix-016,Wednesday,cat-fantasy,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-016.jpg,,,,,Fantasy,series,,,,,,,,,,
+testflix-017,Avatar: The Way of Water,cat-sci-fi,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-017.jpg,,,,,Sci-Fi,movie,,,,,,,,,,
+testflix-018,The Gentlemen,cat-crime,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-018.jpg,,,,,Crime,series,,,,,,,,,,
+testflix-019,Avengers: Endgame,cat-action,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-019.jpg,,,,,Action,movie,,,,,,,,,,
+testflix-020,Kalki 2898 AD,cat-sci-fi,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/testflix-020.jpg,,,,,Sci-Fi,movie,,,,,,,,,,
