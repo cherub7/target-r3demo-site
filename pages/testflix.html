@@ -546,7 +546,7 @@
     </style>
     <script>
         var RECS_MBOX_GLOBAL = 'testflix-most-viewed-recs';
-        var RECS_MBOX_REGION = 'testflix-most-viewed-by-region-recs';
+        var RECS_MBOX_REGION = 'r3demo-pabr-region';
 
         function getRecsMbox() {
             return isRegionEnabled() ? RECS_MBOX_REGION : RECS_MBOX_GLOBAL;
@@ -598,6 +598,14 @@
 
         function isRegionEnabled() { return _regionEnabled; }
 
+        function getRecsSectionTitle() {
+            if (!isRegionEnabled()) {
+                return "Recommended for you based on 'Most Viewed titles'";
+            }
+            var region = getActivePersona().region;
+            return "Recommended for you based on 'Most Viewed titles in your region (" + region + ")'";
+        }
+
         function crossfadeRecsTitle(newText) {
             var el = document.getElementById('recs-section-title');
             if (!el) return;
@@ -612,7 +620,7 @@
             _regionEnabled = enabled;
             var track = document.getElementById('region-toggle-track');
             if (track) track.classList.toggle('is-on', enabled);
-            crossfadeRecsTitle(enabled ? 'Popular titles in your region' : 'Popular titles');
+            crossfadeRecsTitle(getRecsSectionTitle());
             var mboxLabel = document.getElementById('recs-mbox-label');
             if (mboxLabel) mboxLabel.textContent = getRecsMbox();
             refreshRecommendations();
@@ -630,6 +638,7 @@
             _activePersonaId = id;
             syncPersonaUI();
             closePersonaDropdown();
+            if (isRegionEnabled()) crossfadeRecsTitle(getRecsSectionTitle());
             refreshRecommendations();
         }
 
@@ -862,7 +871,7 @@
 
         <div class="card content-card mb-4">
             <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0 section-title"><span id="recs-section-title">Popular titles</span></h2>
+                <h2 class="h5 mb-0 section-title"><span id="recs-section-title">Recommended for you based on 'Most Viewed titles'</span></h2>
             </div>
             <div class="card-body">
                 <div class="recs-panel-wrap">
