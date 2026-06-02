@@ -7,6 +7,8 @@ Simple website to demonstrate Adobe Target Recommendations.
 Demos Implemented:
 1. Recently Viewed
 2. Most Viewed Across Site
+3. Most Viewed by Region
+4. Testflix
 
 ---
 
