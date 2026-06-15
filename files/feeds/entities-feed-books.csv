@@ -1,0 +1,25 @@
+## RECSRecommendations Upload File
+## RECS''## RECS'' indicates a Recommendations pre-process header. Please do not remove these lines.
+## RECS
+## RECSBooks catalog: 20 famous books across US, UK, and India. entity.custom1 = genre, entity.custom2 = region, entity.custom3 = author.
+## RECSentity.id,entity.name,entity.categoryId,entity.message,entity.thumbnailUrl,entity.value,entity.pageUrl,entity.inventory,entity.margin,entity.custom1,entity.custom2,entity.custom3,entity.custom4,entity.custom5,entity.custom6,entity.custom7,entity.custom8,entity.custom9,entity.custom10
+book-001,The Great Gatsby,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-001.jpg,12.99,https://example.com/books/book-001,100,,Fiction,US,F. Scott Fitzgerald,,,,,,,
+book-002,To Kill a Mockingbird,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-002.jpg,13.99,https://example.com/books/book-002,100,,Fiction,US,Harper Lee,,,,,,,
+book-003,The Catcher in the Rye,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-003.jpg,11.99,https://example.com/books/book-003,100,,Fiction,US,J.D. Salinger,,,,,,,
+book-004,Atomic Habits,cat-self-help,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-004.jpg,16.99,https://example.com/books/book-004,100,,Self-Help,US,James Clear,,,,,,,
+book-005,Gone Girl,cat-thriller,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-005.jpg,14.99,https://example.com/books/book-005,100,,Thriller,US,Gillian Flynn,,,,,,,
+book-006,The Help,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-006.jpg,15.99,https://example.com/books/book-006,100,,Fiction,US,Kathryn Stockett,,,,,,,
+book-007,The Road,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-007.jpg,13.99,https://example.com/books/book-007,100,,Fiction,US,Cormac McCarthy,,,,,,,
+book-008,Harry Potter and the Philosopher's Stone,cat-fantasy,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-008.jpg,14.99,https://example.com/books/book-008,100,,Fantasy,UK,J.K. Rowling,,,,,,,
+book-009,Pride and Prejudice,cat-classic,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-009.jpg,9.99,https://example.com/books/book-009,100,,Classic,UK,Jane Austen,,,,,,,
+book-010,The Hobbit,cat-fantasy,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-010.jpg,12.99,https://example.com/books/book-010,100,,Fantasy,UK,J.R.R. Tolkien,,,,,,,
+book-011,1984,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-011.jpg,11.99,https://example.com/books/book-011,100,,Dystopia,UK,George Orwell,,,,,,,
+book-012,Normal People,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-012.jpg,14.99,https://example.com/books/book-012,100,,Fiction,UK,Sally Rooney,,,,,,,
+book-013,The Thursday Murder Club,cat-mystery,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-013.jpg,15.99,https://example.com/books/book-013,100,,Mystery,UK,Richard Osman,,,,,,,
+book-014,Bridget Jones's Diary,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-014.jpg,12.99,https://example.com/books/book-014,100,,Fiction,UK,Helen Fielding,,,,,,,
+book-015,The God of Small Things,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-015.jpg,13.99,https://example.com/books/book-015,100,,Fiction,India,Arundhati Roy,,,,,,,
+book-016,The White Tiger,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-016.jpg,12.99,https://example.com/books/book-016,100,,Fiction,India,Aravind Adiga,,,,,,,
+book-017,A Suitable Boy,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-017.jpg,16.99,https://example.com/books/book-017,100,,Fiction,India,Vikram Seth,,,,,,,
+book-018,The Palace of Illusions,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-018.jpg,13.99,https://example.com/books/book-018,100,,Fiction,India,Chitra Banerjee Divakaruni,,,,,,,
+book-019,Five Point Someone,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-019.jpg,10.99,https://example.com/books/book-019,100,,Fiction,India,Chetan Bhagat,,,,,,,
+book-020,Shantaram,cat-fiction,,https://raw.githubusercontent.com/cherub7/target-r3demo-site/refs/heads/main/files/images/book-020.jpg,17.99,https://example.com/books/book-020,100,,Fiction,India,Gregory David Roberts,,,,,,,

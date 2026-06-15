@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Reading Room — Top Sold Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../files/bootstrap.min.css">
+    <style>
+        :root {
+            --book-bg:           #13100c;
+            --book-surface:      #1c1610;
+            --book-card:         #221b12;
+            --book-border:       #33271a;
+            --book-border-hover: #4a3520;
+            --book-accent:       #c4906a;
+            --book-accent-hover: #d4a07a;
+            --book-text:         #ede0cb;
+            --book-text-muted:   #9a8870;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--book-bg);
+            color: var(--book-text);
+            font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+            font-size: 0.95rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h2.section-title {
+            font-family: "Lora", Georgia, serif;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        /* ── Top nav ── */
+        .bookstore-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1.5rem;
+            background: rgba(19, 16, 12, 0.97);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--book-border);
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            width: 100vw;
+        }
+
+        .bookstore-logo {
+            font-family: "Lora", Georgia, serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--book-accent);
+            text-decoration: none;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .bookstore-logo:hover { color: var(--book-accent-hover); text-decoration: none; }
+
+        /* ── Persona switcher ── */
+        .persona-switcher-wrap { position: relative; z-index: 10; }
+        .persona-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 27, 18, 0.92);
+            border: 1px solid var(--book-border);
+            border-radius: 24px;
+            padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+            cursor: pointer;
+            color: var(--book-text);
+            font-family: "Source Sans 3", system-ui, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .persona-trigger:hover { border-color: var(--book-border-hover); background: rgba(50, 38, 22, 0.96); }
+        .persona-trigger:focus-visible { outline: 2px solid var(--book-accent); outline-offset: 2px; }
+        .persona-avatar {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; color: #fff; flex-shrink: 0;
+            font-family: "Lora", Georgia, serif;
+        }
+        .persona-chevron { width: 14px; height: 14px; opacity: 0.5; transition: transform 0.2s; flex-shrink: 0; }
+        .persona-switcher-wrap.is-open .persona-chevron { transform: rotate(180deg); }
+        .persona-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 210px;
+            background: #1f1810;
+            border: 1px solid var(--book-border);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .persona-switcher-wrap.is-open .persona-dropdown { display: block; }
+        .persona-dropdown-label {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--book-text-muted);
+            padding: 0.65rem 1rem 0.35rem;
+        }
+        .persona-dropdown-item {
+            display: flex; align-items: center; gap: 0.65rem;
+            padding: 0.55rem 1rem; cursor: pointer; transition: background 0.15s;
+            border: none; background: none; width: 100%;
+            text-align: left; color: var(--book-text); font-family: inherit;
+        }
+        .persona-dropdown-item:hover { background: rgba(255,255,255,0.04); }
+        .persona-dropdown-item.is-active { background: rgba(196, 144, 106, 0.1); }
+        .persona-item-name { font-size: 0.875rem; font-weight: 600; color: var(--book-text-muted); line-height: 1.2; }
+        .persona-dropdown-item.is-active .persona-item-name { color: var(--book-text); }
+        .persona-item-region { font-size: 0.72rem; color: var(--book-text-muted); opacity: 0.7; margin-top: 1px; }
+        .persona-item-check { margin-left: auto; width: 14px; height: 14px; color: var(--book-accent); opacity: 0; }
+        .persona-dropdown-item.is-active .persona-item-check { opacity: 1; }
+
+        /* ── Cards ── */
+        .content-card {
+            border: 1px solid var(--book-border);
+            border-radius: 10px;
+            background: var(--book-surface);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            scroll-margin-top: 4rem;
+        }
+        .content-card:hover { border-color: var(--book-border-hover); }
+        .section-header { background: var(--book-card); border: none; padding: 1rem 1.35rem; }
+
+        /* ── Horizontal scroll strip ── */
+        .catalog-scroll-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -0.5rem;
+            padding: 0 0.5rem 0.75rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--book-border-hover) var(--book-surface);
+        }
+
+        #catalog,
+        #target-recs-top-sold {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 16px;
+            width: max-content;
+            min-width: 100%;
+        }
+
+        /* Force injected recs to stay horizontal */
+        #target-recs-top-sold {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch;
+        }
+        #target-recs-top-sold > .d-flex {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: max-content !important;
+            min-width: 100%;
+        }
+
+        /* ── Book tile ── */
+        #catalog .card,
+        #target-recs-top-sold .card,
+        #target-recs-top-sold > a.card {
+            flex: 0 0 auto;
+            min-width: 195px;
+            max-width: 195px;
+            border: 1px solid var(--book-border);
+            border-radius: 8px;
+            background: var(--book-card);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            --bs-card-width: auto;
+        }
+        #catalog .card:hover,
+        #target-recs-top-sold .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--book-accent);
+            box-shadow: 0 10px 28px rgba(196, 144, 106, 0.18);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            background: #2a2010;
+            display: block;
+        }
+
+        .book-tile-body { padding: 0.75rem 0.875rem 0.9rem; }
+
+        .book-title {
+            font-family: "Lora", Georgia, serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--book-text);
+            margin-bottom: 0.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            font-size: 0.76rem;
+            color: var(--book-text-muted);
+            margin-bottom: 0.55rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .genre-tag, .region-tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.18rem 0.45rem;
+            border-radius: 4px;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        /* Genre tag colours — muted dark pastels */
+        .genre-fiction   { background: rgba(107,143,126,0.15); color: #8fbfab; border: 1px solid rgba(107,143,126,0.28); }
+        .genre-thriller  { background: rgba(143,107,122,0.15); color: #bf8fab; border: 1px solid rgba(143,107,122,0.28); }
+        .genre-fantasy   { background: rgba(122,107,143,0.15); color: #ab8fbf; border: 1px solid rgba(122,107,143,0.28); }
+        .genre-mystery   { background: rgba(143,138,107,0.15); color: #bfba8f; border: 1px solid rgba(143,138,107,0.28); }
+        .genre-memoir    { background: rgba(143,122,107,0.15); color: #bfab8f; border: 1px solid rgba(143,122,107,0.28); }
+        .genre-self-help { background: rgba(107,122,143,0.15); color: #8fabbf; border: 1px solid rgba(107,122,143,0.28); }
+        .genre-classic   { background: rgba(122,143,107,0.15); color: #abbf8f; border: 1px solid rgba(122,143,107,0.28); }
+        .genre-dystopia  { background: rgba(143,107,107,0.15); color: #bf8f8f; border: 1px solid rgba(143,107,107,0.28); }
+
+        /* Region badge */
+        .region-us    { background: rgba(196,144,106,0.12); color: #c4906a; border: 1px solid rgba(196,144,106,0.28); }
+        .region-uk    { background: rgba(107,122,143,0.12); color: #8fabbf; border: 1px solid rgba(107,122,143,0.28); }
+        .region-india { background: rgba(107,143,126,0.12); color: #8fbfab; border: 1px solid rgba(107,143,126,0.28); }
+
+        .book-buy-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .book-price {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--book-accent);
+            font-family: "Lora", Georgia, serif;
+        }
+
+        .buy-btn {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 5px;
+            background: var(--book-accent);
+            color: #13100c;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+        .buy-btn:hover { background: var(--book-accent-hover); }
+        .buy-btn:active { transform: scale(0.97); }
+        .buy-btn:focus-visible { outline: 2px solid var(--book-accent); outline-offset: 2px; }
+
+        /* ── Recs loading overlay ── */
+        .recs-panel-wrap { position: relative; min-height: 5rem; }
+        #recs-loading-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            align-items: center;
+            justify-content: center;
+            background: rgba(19, 16, 12, 0.55);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        #recs-loading-overlay.is-visible { display: flex; }
+
+        /* ── Section title crossfade ── */
+        #recs-section-title { transition: opacity 0.35s ease; display: inline; }
+        #recs-section-title.fading { opacity: 0; }
+
+        /* ── Alerts ── */
+        .alert-info    { background: rgba(196,144,106,0.1);  border-color: var(--book-border);  color: var(--book-text); }
+        .alert-warning { background: rgba(196,150, 50,0.08); border-color: #5c4400;             color: var(--book-text-muted); }
+        .alert-danger  { background: rgba(160, 50, 50,0.12); border-color: #5c2020;             color: var(--book-text); }
+        .alert code    { background: #2a2010; color: var(--book-accent); padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.85em; }
+        .content-card .card-body code { background: #2a2010; color: var(--book-accent); padding: 0.2em 0.4em; border-radius: 4px; }
+
+        /* ── Misc ── */
+        .text-muted { color: var(--book-text-muted) !important; }
+        .btn-light  { background: transparent; border: 1px solid var(--book-text-muted); color: var(--book-text); font-weight: 600; }
+        .btn-light:hover { background: rgba(255,255,255,0.06); border-color: var(--book-text); color: var(--book-text); }
+        .btn-outline-secondary { border-color: var(--book-text-muted); color: var(--book-text); }
+        .btn-outline-secondary:hover { background: rgba(255,255,255,0.06); color: var(--book-text); border-color: var(--book-text); }
+
+        /* ── Bottom meta / settings panel ── */
+        .bottom-meta { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem; }
+        .bottom-meta-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; padding: 0 0.5rem; }
+        .know-more-details { flex: 0 0 auto; position: relative; }
+        .know-more-details .know-more-body {
+            position: absolute; top: calc(100% + 6px);
+            min-width: 260px; background: #1f1810;
+            border: 1px solid var(--book-border); border-radius: 10px;
+            padding: 0.75rem 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.55); z-index: 20;
+        }
+        .know-more-details:first-child .know-more-body { left: 0; max-width: 36rem; }
+        .settings-details .know-more-body { right: 0; min-width: 260px; }
+        .know-more-summary {
+            font-size: 0.78rem; font-weight: 600; color: var(--book-text-muted); cursor: pointer;
+            letter-spacing: 0.02em; list-style: none;
+            display: flex; align-items: center; gap: 0.35rem; user-select: none;
+        }
+        .know-more-summary::-webkit-details-marker { display: none; }
+        .know-more-summary::before { content: '›'; font-size: 1rem; line-height: 1; transition: transform 0.2s; display: inline-block; }
+        details.know-more-details[open] .know-more-summary::before { transform: rotate(90deg); }
+        .know-more-summary:hover { color: var(--book-text); }
+        .know-more-body { margin-top: 0; font-size: 0.75rem; color: var(--book-text-muted); line-height: 1.55; }
+        .know-more-body strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+        .know-more-body code { background: #2a2010; color: var(--book-accent); padding: 0.15em 0.35em; border-radius: 3px; font-size: 0.72rem; }
+
+        /* ── Settings toggle ── */
+        .settings-toggle-row { display: flex; align-items: center; gap: 0.65rem; margin-top: 0.65rem; }
+        .settings-toggle-track {
+            position: relative; width: 36px; height: 20px; background: #444;
+            border-radius: 10px; flex-shrink: 0; transition: background 0.2s; cursor: pointer;
+        }
+        .settings-toggle-track.is-on { background: var(--book-accent); }
+        #region-toggle { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+        .settings-toggle-thumb {
+            position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            background: #fff; border-radius: 50%; transition: transform 0.2s; pointer-events: none;
+        }
+        .settings-toggle-track.is-on .settings-toggle-thumb { transform: translateX(16px); }
+        .settings-toggle-label-text { font-size: 0.78rem; font-weight: 600; color: var(--book-text-muted); cursor: pointer; user-select: none; }
+        .settings-toggle-desc { margin-top: 0.45rem; font-size: 0.72rem; color: var(--book-text-muted); opacity: 0.75; line-height: 1.45; }
+        .settings-toggle-desc code { background: #2a2010; color: var(--book-accent); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.68rem; }
+
+        /* ── Toast ── */
+        .toast-container { z-index: 1085; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            #catalog .card, #target-recs-top-sold .card { transition: none !important; transform: none !important; }
+        }
+    </style>
+    <script>
+        var RECS_MBOX_GLOBAL = 'r3demo-top-sold-recs';
+        var RECS_MBOX_REGION = 'r3demo-top-sold-by-region-recs';
+
+        function getRecsMbox() {
+            return isRegionEnabled() ? RECS_MBOX_REGION : RECS_MBOX_GLOBAL;
+        }
+
+        window.targetGlobalSettings = {
+            clientCode: 'bullseye',
+            serverDomain: 'bullseye.tt.omtrdc.net',
+            overrideMboxEdgeServer: false,
+            timeout: 8000,
+            bodyHidingEnabled: false,
+            cookieDomain: window.location.hostname
+        };
+
+
+        var CATALOG = [
+            { id: 'book-001', name: 'The Great Gatsby',                    author: 'F. Scott Fitzgerald',         categoryId: 'cat-fiction',   value: '12.99', genre: 'Fiction',   region: 'US'    },
+            { id: 'book-002', name: 'To Kill a Mockingbird',                author: 'Harper Lee',                  categoryId: 'cat-fiction',   value: '13.99', genre: 'Fiction',   region: 'US'    },
+            { id: 'book-003', name: 'The Catcher in the Rye',               author: 'J.D. Salinger',               categoryId: 'cat-fiction',   value: '11.99', genre: 'Fiction',   region: 'US'    },
+            { id: 'book-004', name: 'Atomic Habits',                        author: 'James Clear',                 categoryId: 'cat-self-help', value: '16.99', genre: 'Self-Help', region: 'US'    },
+            { id: 'book-005', name: 'Gone Girl',                            author: 'Gillian Flynn',               categoryId: 'cat-thriller',  value: '14.99', genre: 'Thriller',  region: 'US'    },
+            { id: 'book-006', name: 'The Help',                              author: 'Kathryn Stockett',            categoryId: 'cat-fiction',   value: '15.99', genre: 'Fiction',   region: 'US'    },
+            { id: 'book-007', name: 'The Road',                             author: 'Cormac McCarthy',             categoryId: 'cat-fiction',   value: '13.99', genre: 'Fiction',   region: 'US'    },
+            { id: 'book-008', name: "Harry Potter and the Philosopher's Stone", author: 'J.K. Rowling',            categoryId: 'cat-fantasy',   value: '14.99', genre: 'Fantasy',   region: 'UK'    },
+            { id: 'book-009', name: 'Pride and Prejudice',                  author: 'Jane Austen',                 categoryId: 'cat-classic',   value: '9.99',  genre: 'Classic',   region: 'UK'    },
+            { id: 'book-010', name: 'The Hobbit',                           author: 'J.R.R. Tolkien',             categoryId: 'cat-fantasy',   value: '12.99', genre: 'Fantasy',   region: 'UK'    },
+            { id: 'book-011', name: '1984',                                 author: 'George Orwell',               categoryId: 'cat-fiction',   value: '11.99', genre: 'Dystopia',  region: 'UK'    },
+            { id: 'book-012', name: 'Normal People',                        author: 'Sally Rooney',                categoryId: 'cat-fiction',   value: '14.99', genre: 'Fiction',   region: 'UK'    },
+            { id: 'book-013', name: 'The Thursday Murder Club',             author: 'Richard Osman',               categoryId: 'cat-mystery',   value: '15.99', genre: 'Mystery',   region: 'UK'    },
+            { id: 'book-014', name: "Bridget Jones's Diary",                author: 'Helen Fielding',              categoryId: 'cat-fiction',   value: '12.99', genre: 'Fiction',   region: 'UK'    },
+            { id: 'book-015', name: 'The God of Small Things',              author: 'Arundhati Roy',               categoryId: 'cat-fiction',   value: '13.99', genre: 'Fiction',   region: 'India' },
+            { id: 'book-016', name: 'The White Tiger',                      author: 'Aravind Adiga',               categoryId: 'cat-fiction',   value: '12.99', genre: 'Fiction',   region: 'India' },
+            { id: 'book-017', name: 'A Suitable Boy',                       author: 'Vikram Seth',                 categoryId: 'cat-fiction',   value: '16.99', genre: 'Fiction',   region: 'India' },
+            { id: 'book-018', name: 'The Palace of Illusions',              author: 'Chitra Banerjee Divakaruni',  categoryId: 'cat-fiction',   value: '13.99', genre: 'Fiction',   region: 'India' },
+            { id: 'book-019', name: 'Five Point Someone',                   author: 'Chetan Bhagat',               categoryId: 'cat-fiction',   value: '10.99', genre: 'Fiction',   region: 'India' },
+            { id: 'book-020', name: 'Shantaram',                            author: 'Gregory David Roberts',       categoryId: 'cat-fiction',   value: '17.99', genre: 'Fiction',   region: 'India' }
+        ];
+
+        var PERSONAS = [
+            { id: 'michael', name: 'Michael', region: 'US',    regionLabel: 'United States',   color: '#c4906a', initial: 'M' },
+            { id: 'neeraj',  name: 'Neeraj',  region: 'INDIA', regionLabel: 'India',           color: '#6b8f7e', initial: 'N' },
+            { id: 'chris',   name: 'Chris',   region: 'UK',    regionLabel: 'United Kingdom',  color: '#6b7a8f', initial: 'C' }
+        ];
+        var _activePersonaId = 'michael';
+        var _regionEnabled   = false;
+
+        function isRegionEnabled() { return _regionEnabled; }
+        function getActivePersona() { return PERSONAS.find(function (p) { return p.id === _activePersonaId; }) || PERSONAS[0]; }
+        function getSelectedRegion() { return getActivePersona().region; }
+
+        function crossfadeRecsTitle(newText) {
+            var el = document.getElementById('recs-section-title');
+            if (!el) return;
+            el.classList.add('fading');
+            setTimeout(function () { el.textContent = newText; el.classList.remove('fading'); }, 350);
+        }
+
+        function getRecsSectionTitle() {
+            return isRegionEnabled() ? 'Top Sold in ' + getActivePersona().regionLabel : 'Top Sold';
+        }
+
+        function setRegionEnabled(enabled) {
+            _regionEnabled = enabled;
+            var track = document.getElementById('region-toggle-track');
+            if (track) track.classList.toggle('is-on', enabled);
+            crossfadeRecsTitle(getRecsSectionTitle());
+            var mboxLabel = document.getElementById('recs-mbox-label');
+            if (mboxLabel) mboxLabel.textContent = getRecsMbox();
+            refreshRecommendations();
+        }
+
+        function selectPersona(id) {
+            _activePersonaId = id;
+            syncPersonaUI();
+            closePersonaDropdown();
+            if (isRegionEnabled()) crossfadeRecsTitle(getRecsSectionTitle());
+            refreshRecommendations();
+        }
+
+        function syncPersonaUI() {
+            var p = getActivePersona();
+            var triggerAvatar = document.getElementById('persona-trigger-avatar');
+            var triggerName   = document.getElementById('persona-trigger-name');
+            if (triggerAvatar) { triggerAvatar.textContent = p.initial; triggerAvatar.style.background = p.color; }
+            if (triggerName)   triggerName.textContent = p.name;
+            document.querySelectorAll('[data-persona-id]').forEach(function (el) {
+                el.classList.toggle('is-active', el.getAttribute('data-persona-id') === p.id);
+            });
+        }
+
+        function togglePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.toggle('is-open');
+        }
+
+        function closePersonaDropdown() {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap) wrap.classList.remove('is-open');
+        }
+
+        document.addEventListener('click', function (e) {
+            var wrap = document.getElementById('persona-switcher-wrap');
+            if (wrap && !wrap.contains(e.target)) closePersonaDropdown();
+        });
+
+        function setRecsLoadingVisible(show) {
+            var overlay = document.getElementById('recs-loading-overlay');
+            if (overlay) overlay.classList.toggle('is-visible', show);
+        }
+
+        // ── Purchase event ────────────────────────────────────────────────────
+        function buyItem(entityId) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                showToast('Target at.js not loaded. Cannot send purchase events.', true);
+                return;
+            }
+            var item = CATALOG.find(function (b) { return b.id === entityId; });
+            if (!item) return;
+            adobe.target.trackEvent({
+                mbox: 'item-purchase-mbox',
+                params: {
+                    'orderId':            'ord-' + Date.now(),
+                    'orderTotal':         item.value,
+                    'productPurchasedId': item.id,
+                    'recsRegion':         getSelectedRegion()
+                },
+                success: function () { showToast('Purchase recorded for “' + item.name + '”', false); },
+                error:   function () { showToast('Error recording purchase for “' + item.name + '”', true); }
+            });
+        }
+
+        function showToast(message, isError) {
+            var toastEl = document.getElementById('purchase-toast');
+            var body    = document.getElementById('purchase-toast-body');
+            if (!toastEl || !body) return;
+            body.textContent = message;
+            toastEl.classList.remove('text-bg-dark', 'text-bg-danger', 'border-secondary', 'border-danger');
+            toastEl.classList.add(isError ? 'text-bg-danger' : 'text-bg-dark', isError ? 'border-danger' : 'border-secondary');
+            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000, autohide: true }).show();
+            } else {
+                window.alert(message);
+            }
+        }
+
+        // ── Recommendations ───────────────────────────────────────────────────
+        function assertTargetLoaded(container) {
+            if (typeof adobe === 'undefined' || !adobe.target) {
+                if (container) container.innerHTML = '<div class="alert alert-danger mb-0">Target at.js not loaded. Check <code>../scripts/at.js</code> path and the Network tab.</div>';
+                return false;
+            }
+            return true;
+        }
+
+        function offerLooksLikeClickOnly(offer) {
+            if (!offer) return true;
+            var list = Array.isArray(offer) ? offer : [offer];
+            if (!list.length) return true;
+            return list.every(function (a) { return a && (a.action === 'signalClick' || a.action === 'click'); });
+        }
+
+        function refreshRecommendations() {
+            var container = document.getElementById('target-recs-top-sold');
+            if (!container) return;
+            if (!assertTargetLoaded(container)) { setRecsLoadingVisible(false); return; }
+
+            setRecsLoadingVisible(true);
+            container.style.opacity    = '0.3';
+            container.style.transition = 'opacity 0.3s ease-out';
+
+            var mbox       = getRecsMbox();
+            var offerParams = isRegionEnabled() ? { recsRegion: getSelectedRegion() } : {};
+
+            adobe.target.getOffer({
+                mbox: mbox,
+                selector: '#target-recs-top-sold',
+                params: offerParams,
+                success: function (offer) {
+                    if (window.location.search.indexOf('recsDebug=1') !== -1) {
+                        console.log('[Recs] mbox=' + mbox, 'offer:', offer);
+                    }
+                    if (offerLooksLikeClickOnly(offer)) {
+                        setRecsLoadingVisible(false);
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity    = '1';
+                        container.innerHTML = '<div class="alert alert-warning mb-0">Target returned only click-tracking actions (<code>signalClick</code>), not HTML. Check the activity template for <code>' + mbox + '</code>. Use <code>?recsDebug=1</code> to log the raw offer.</div>';
+                        return;
+                    }
+                    adobe.target.applyOffer({ mbox: mbox, selector: '#target-recs-top-sold', offer: offer });
+                    setTimeout(function () {
+                        setRecsLoadingVisible(false);
+                        container.style.transition = 'opacity 2s ease-in';
+                        container.style.opacity    = '1';
+                        var html = (container.innerHTML || '').trim();
+                        if (html.length < 50 || html.indexOf('Loading') !== -1 || html.indexOf('signalClick') !== -1) {
+                            container.innerHTML = '<div class="alert alert-warning mb-0">No recommendation HTML applied for mbox <code>' + mbox + '</code>. Use <code>?recsDebug=1</code> to inspect the raw offer.</div>';
+                        }
+                    }, 200);
+                },
+                error: function (err) {
+                    console.warn('[Recs] getOffer error, mbox=' + mbox, err);
+                    setRecsLoadingVisible(false);
+                    container.style.transition = 'opacity 2s ease-in';
+                    container.style.opacity    = '1';
+                    container.innerHTML = '<div class="alert alert-danger mb-0">getOffer failed for mbox <code>' + mbox + '</code>. Check console (F12).</div>';
+                }
+            });
+        }
+
+        // ── Catalog rendering ─────────────────────────────────────────────────
+        function genreClass(genre) {
+            var map = {
+                'Fiction': 'genre-fiction', 'Thriller': 'genre-thriller', 'Fantasy': 'genre-fantasy',
+                'Mystery': 'genre-mystery', 'Memoir':   'genre-memoir',   'Self-Help': 'genre-self-help',
+                'Classic': 'genre-classic', 'Dystopia': 'genre-dystopia'
+            };
+            return map[genre] || 'genre-fiction';
+        }
+
+        function regionClass(region) {
+            if (region === 'US') return 'region-us';
+            if (region === 'UK') return 'region-uk';
+            return 'region-india';
+        }
+
+        function renderCatalog() {
+            var container = document.getElementById('catalog');
+            if (!container) return;
+            container.innerHTML = CATALOG.map(function (book) {
+                var imgUrl = '../files/images/' + book.id + '.jpg';
+                var safeName = book.name.replace(/&/g, '&amp;').replace(/'/g, '&#39;');
+                return '<div class="card">' +
+                    '<img src="' + imgUrl + '" class="book-cover" alt="" loading="lazy">' +
+                    '<div class="book-tile-body">' +
+                    '<div class="book-title">' + book.name + '</div>' +
+                    '<div class="book-author">' + book.author + '</div>' +
+                    '<div class="book-meta-row">' +
+                    '<span class="genre-tag ' + genreClass(book.genre) + '">' + book.genre + '</span>' +
+                    '<span class="region-tag ' + regionClass(book.region) + '">' + book.region + '</span>' +
+                    '</div>' +
+                    '<div class="book-buy-row">' +
+                    '<span class="book-price">$' + book.value + '</span>' +
+                    '<button class="buy-btn" onclick="buyItem(\'' + book.id + '\')" aria-label="Buy ' + safeName + '">Buy</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            var mboxLabel = document.getElementById('recs-mbox-label');
+            if (mboxLabel) mboxLabel.textContent = getRecsMbox();
+
+            var list = document.getElementById('persona-dropdown-list');
+            if (list) {
+                list.innerHTML = PERSONAS.map(function (p) {
+                    return '<button type="button" class="persona-dropdown-item" data-persona-id="' + p.id + '" onclick="selectPersona(\'' + p.id + '\')">' +
+                        '<span class="persona-avatar" style="background:' + p.color + '">' + p.initial + '</span>' +
+                        '<div><div class="persona-item-name">' + p.name + '</div><div class="persona-item-region">' + p.regionLabel + '</div></div>' +
+                        '<svg class="persona-item-check" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>' +
+                        '</button>';
+                }).join('');
+            }
+
+            syncPersonaUI();
+            renderCatalog();
+            setTimeout(refreshRecommendations, 1000);
+        });
+    </script>
+    <script src="../scripts/at.js"></script>
+</head>
+<body>
+    <button type="button" id="nonConversionClickTrackSelector" class="visually-hidden" tabindex="-1" aria-hidden="true">Target metric</button>
+
+    <!-- Top nav -->
+    <nav class="bookstore-topbar">
+        <a href="../index.html" class="bookstore-logo" aria-label="The Reading Room home">The Reading Room</a>
+        <div class="persona-switcher-wrap" id="persona-switcher-wrap" aria-label="Switch reader profile">
+            <button class="persona-trigger" id="persona-trigger" onclick="togglePersonaDropdown()" aria-haspopup="listbox" aria-expanded="false">
+                <span class="persona-avatar" id="persona-trigger-avatar" style="background:#c4906a">M</span>
+                <span class="persona-name" id="persona-trigger-name">Michael</span>
+                <svg class="persona-chevron" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+            </button>
+            <div class="persona-dropdown" id="persona-dropdown" role="listbox">
+                <div class="persona-dropdown-label">Switch reader</div>
+                <div id="persona-dropdown-list"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-3 py-md-4">
+
+        <!-- Browse catalog -->
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0 section-title">Browse catalog</h2>
+            </div>
+            <div class="card-body">
+                <div class="catalog-scroll-wrap">
+                    <div id="catalog" class="d-flex" style="gap: 16px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card content-card mb-4">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0 section-title"><span id="recs-section-title">Top Sold</span></h2>
+            </div>
+            <div class="card-body">
+                <div class="recs-panel-wrap">
+                    <div id="recs-loading-overlay" aria-hidden="true">
+                        <div class="spinner-border" style="color: var(--book-accent); width: 2.5rem; height: 2.5rem;" role="status">
+                            <span class="visually-hidden">Loading recommendations</span>
+                        </div>
+                    </div>
+                    <div class="catalog-scroll-wrap">
+                        <div id="target-recs-top-sold" class="d-flex position-relative" style="gap: 16px;">
+                            <div class="alert alert-info mb-0">
+                                <strong>Loading&hellip;</strong> Configure a Top Sold activity with mbox <code>r3demo-top-sold-recs</code> to see recommendations here.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom meta -->
+        <div class="mt-5 pt-2 pb-4 bottom-meta">
+            <div class="bottom-meta-row">
+                <details class="know-more-details">
+                    <summary class="know-more-summary">How this demo works</summary>
+                    <div class="know-more-body">
+                        <p class="mb-2"><strong>Profiles</strong> — Michael (US), Neeraj (India), Chris (UK). Switching profile changes the active region.</p>
+                        <p class="mb-2"><strong>Catalog</strong> — Clicking <em>Buy</em> sends a purchase event on <code>item-purchase-mbox</code> with <code>orderId</code>, <code>orderTotal</code>, <code>productPurchasedId</code>, and <code>recsRegion</code> for the active profile.</p>
+                        <p class="mb-2"><strong>Recommendations</strong> — Calls Target mbox <code id="recs-mbox-label"></code>. When region personalisation is on, <code>recsRegion</code> is also sent with the recs request to surface region-specific results.</p>
+                        <p class="mb-0"><strong>Target setup</strong> — Profile script <code>recsAttributeRegion</code>: <code>return mbox.param("recsRegion");</code>. Use <code>?recsDebug=1</code> to log raw offers to the console.</p>
+                    </div>
+                </details>
+
+                <details class="know-more-details settings-details">
+                    <summary class="know-more-summary">Settings</summary>
+                    <div class="know-more-body">
+                        <div class="settings-toggle-row">
+                            <label class="settings-toggle-track" id="region-toggle-track" for="region-toggle">
+                                <input type="checkbox" id="region-toggle" role="switch" onchange="setRegionEnabled(this.checked)">
+                                <span class="settings-toggle-thumb"></span>
+                            </label>
+                            <label class="settings-toggle-label-text" for="region-toggle">Personalise by region</label>
+                        </div>
+                        <p class="settings-toggle-desc">When enabled, sends <code>recsRegion</code> with the recommendation request and switches to the regional mbox <code>r3demo-top-sold-by-region-recs</code>.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="purchase-toast" class="toast text-bg-dark border border-secondary" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+            <div class="toast-body py-2 px-3" id="purchase-toast-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
