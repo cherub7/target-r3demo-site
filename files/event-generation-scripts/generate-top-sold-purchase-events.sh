@@ -70,11 +70,11 @@ body = {
         "id": rid(),
         "type": "display",
         "timestamp": int(time.time() * 1000),
-        "parameters": {
-            "orderId":            order_id,
-            "orderTotal":         total,
-            "productPurchasedId": e,
-            "recsRegion":         r,
+        "parameters": {"recsRegion": r},
+        "order": {
+            "id":                  order_id,
+            "total":               str(float(total)),
+            "purchasedProductIds": [e],
         },
         "mbox": {"name": "item-purchase-mbox"},
     }],
