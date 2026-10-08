@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Recently Viewed Demo (Web SDK)</title>
+    <link rel="stylesheet" href="../files/bootstrap.min.css">
+    <style>
+        body { background: #f8f9fa; }
+        .section-header { background: #2d3748; border: none; padding: 1rem 1.25rem; }
+        .content-card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+        #available-items .card, #target-recs .card {
+            min-width: 150px; max-width: 150px; border: 1px solid #e9ecef; border-radius: 8px; background: white;
+            transition: all 0.3s ease;
+        }
+        #available-items .card:hover, #target-recs .card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); }
+        #available-items .card-img-top, #target-recs .card-img-top { height: 120px; object-fit: cover; border-radius: 8px 8px 0 0; }
+        #available-items .card-body, #target-recs .card-body { padding: 0.75rem; }
+        #available-items h6, #target-recs h4, #target-recs h5, #target-recs h6 { font-size: 0.875rem; margin-bottom: 0.5rem; color: #2d3748; font-weight: 600; }
+        #available-items p, #target-recs p { font-size: 0.875rem; margin-bottom: 0.75rem; }
+        .btn-primary { background: #4a5568; border: none; font-weight: 500; border-radius: 6px; color: white; }
+        .btn-primary:hover { background: #2d3748; }
+        .btn-light { background: white; border: none; color: #2d3748; font-weight: 600; }
+        .btn-outline-secondary { border-color: #cbd5e0; color: #4a5568; border-radius: 8px; }
+        .btn-outline-secondary:hover { background: #4a5568; border-color: #4a5568; color: white; }
+        code.kv { background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
+        #log { font: 12px monospace; white-space: pre-wrap; max-height: 240px; overflow: auto; background: #1a202c; color: #e2e8f0; padding: .75rem; border-radius: 6px; margin: 0; }
+    </style>
+
+    <!-- AEP Web SDK (alloy.js) base code + library: https://experienceleague.adobe.com/en/docs/experience-platform/collection/js/install/library -->
+    <script>
+        !function(n,o){o.forEach(function(o){n[o]||((n.__alloyNS=n.__alloyNS||[]).push(o),n[o]=function(){var u=arguments;return new Promise(function(i,l){n.setTimeout(function(){n[o].q.push([i,l,u])})})},n[o].q=[])})}(window,["alloy"]);
+    </script>
+    <script src="https://cdn1.adoberesources.net/alloy/2.36.0/alloy.min.js" async></script>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold" style="color: #2d3748;">Recently Viewed Demo (Web SDK)</h1>
+            <p class="text-muted">Same activity as the at.js page, delivered through the AEP Web SDK and Edge Network.
+                Inclusion rules can use AEP edge profile attributes (<code>profile.UPA__bullseye.*</code>).</p>
+        </div>
+
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">Visitor</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-5">
+                        <label for="user-select" class="form-label small fw-bold mb-1">AEP identity (namespace <code>RecsPocId</code>)</label>
+                        <select id="user-select" class="form-select form-select-sm" onchange="switchUser(this.value)">
+                            <option value="poc-user-1">poc-user-1 (has purchasedSkus)</option>
+                            <option value="poc-user-2">poc-user-2 (control, no SKUs)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7 small">
+                        <div><strong>ECID:</strong> <code id="ecid" class="kv">...</code></div>
+                        <div class="text-muted mt-1">Switching user clears this site's Web SDK cookies (<code>kndctr_*</code>, <code>AMCV_*</code>) and reloads,
+                            so each user gets a new ECID. This stops two users sharing one ECID, which could link them in the AEP identity graph.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Available Items</h2>
+                <button onclick="viewAll()" class="btn btn-light btn-sm">View all 5</button>
+            </div>
+            <div class="card-body">
+                <div id="available-items" class="d-flex flex-wrap" style="gap: 15px;"></div>
+            </div>
+        </div>
+
+        <div class="card mb-4 content-card">
+            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Your Recently Viewed Items</h2>
+                <button onclick="refreshRecommendations()" class="btn btn-light btn-sm">🔄 Refresh</button>
+            </div>
+            <div class="card-body">
+                <div class="small mb-3"><strong>Recommended IDs:</strong> <span id="ids">-</span></div>
+                <div id="target-recs">
+                    <div class="alert alert-info"><strong>No items viewed yet.</strong> Click on items above to view them.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card content-card">
+            <div class="card-header section-header text-white">
+                <h2 class="h5 mb-0">📝 Details and log</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 small mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-1"><strong>Client:</strong> <code class="kv">bullseye</code>
+                            &nbsp;<strong>Activity ID:</strong> <code class="kv">1674070</code>
+                            &nbsp;<strong>Rec-Unit ID:</strong> <code class="kv">387820</code></div>
+                        <div class="mb-1"><strong>Datastream:</strong> <code class="kv">eaf93698-ef2e-41ee-b67a-808008dc26e3</code></div>
+                        <div><strong>Scopes:</strong> <code class="kv">item-view-mbox</code> (views), <code class="kv">r3demo-recently-viewed-recs</code> (recs)</div>
+                    </div>
+                    <div class="col-md-6 text-muted">
+                        Debug with Adobe Experience Platform Assurance (Target trace under the Edge events), or set
+                        <code>alloy("setDebug", {enabled: true})</code> and watch the browser console.
+                    </div>
+                </div>
+                <pre id="log"></pre>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="../index.html" class="btn btn-outline-secondary" style="padding: 0.5rem 1.5rem;">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const DATASTREAM_ID = "eaf93698-ef2e-41ee-b67a-808008dc26e3";
+        const ORG_ID = "011B56B451AE49A90A490D4D@AdobeOrg";
+        const RECS_SCOPE = "r3demo-recently-viewed-recs";
+        const USER_KEY = "r3demo-websdk-user";
+        const ITEMS = [
+            { id: "r3demo-001", name: "Laptop Computer", price: "$999.99", img: "../files/images/laptop.jpg" },
+            { id: "r3demo-002", name: "Wireless Mouse", price: "$29.99", img: "../files/images/mouse.jpg" },
+            { id: "r3demo-003", name: "Office Chair", price: "$299.99", img: "../files/images/chair.jpg" },
+            { id: "r3demo-004", name: "Desk Lamp", price: "$49.99", img: "../files/images/lamp.jpg" },
+            { id: "r3demo-005", name: "Notebook Set", price: "$15.99", img: "../files/images/notebook.jpg" }
+        ];
+
+        const log = m => { document.getElementById("log").textContent += new Date().toLocaleTimeString() + "  " + m + "\n"; };
+
+        const USER = localStorage.getItem(USER_KEY) || "poc-user-1";
+        document.getElementById("user-select").value = USER;
+        const identityMap = { RecsPocId: [{ id: USER, primary: true }] };
+
+        document.getElementById("available-items").innerHTML = ITEMS.map(i => `
+            <div class="card text-center">
+                <img src="${i.img}" class="card-img-top" alt="${i.name}">
+                <div class="card-body">
+                    <h6 class="card-title">${i.name}</h6>
+                    <p class="card-text text-primary fw-bold">${i.price}</p>
+                    <button class="btn btn-primary btn-sm w-100" onclick="viewItem('${i.id}').then(refreshRecommendations)">View</button>
+                </div>
+            </div>`).join("");
+
+        function switchUser(user) {
+            // Clear Web SDK cookies (kndctr_*) and the legacy AMCV_* cookie (alloy's ID migration reads ECID from it),
+            // with and without a domain attribute, so alloy mints a new ECID.
+            const h = location.hostname;
+            document.cookie.split(";").map(c => c.split("=")[0].trim())
+                .filter(n => n.startsWith("kndctr_") || n.startsWith("AMCV_"))
+                .forEach(n => ["", "; domain=" + h, "; domain=." + h].forEach(d => {
+                    document.cookie = n + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/" + d;
+                }));
+            localStorage.setItem(USER_KEY, user);
+            location.reload();
+        }
+
+        // thirdPartyCookiesEnabled: false so a shared demdex cookie can't give two users the same ECID.
+        alloy("configure", { datastreamId: DATASTREAM_ID, orgId: ORG_ID, thirdPartyCookiesEnabled: false });
+        alloy("getIdentity")
+            .then(r => { document.getElementById("ecid").textContent = r.identity.ECID; log("user " + USER + ", ECID " + r.identity.ECID); })
+            .catch(e => log("getIdentity error: " + e));
+
+        function viewItem(id) {
+            return alloy("sendEvent", {
+                xdm: { eventType: "web.webpagedetails.pageViews", identityMap },
+                data: { __adobe: { target: { "entity.id": id } } },
+                decisionScopes: ["item-view-mbox"],
+                renderDecisions: false
+            }).then(() => log("viewed " + id)).catch(e => log("view error " + id + ": " + e));
+        }
+
+        async function viewAll() {
+            for (const i of ITEMS) { await viewItem(i.id); }
+            log("viewed all 5");
+            await refreshRecommendations();
+        }
+
+        function refreshRecommendations() {
+            const container = document.getElementById("target-recs");
+            container.style.opacity = "0.3";
+            return alloy("sendEvent", {
+                xdm: { eventType: "decisioning.propositionFetch", identityMap },
+                decisionScopes: [RECS_SCOPE],
+                renderDecisions: false
+            }).then(result => {
+                const html = (result.propositions || []).filter(p => p.scope === RECS_SCOPE)
+                    .flatMap(p => p.items || []).map(i => i.data && i.data.content)
+                    .filter(c => typeof c === "string").join("");
+                if (html) { container.innerHTML = html; }
+                // The design renders names only, so map image alt text back to item IDs.
+                const ids = [...html.replace(/<textarea[\s\S]*?<\/textarea>/g, "").matchAll(/alt='([^']+)'/g)]
+                    .map(m => (ITEMS.find(i => m[1].startsWith(i.name)) || { id: "?" + m[1] }).id);
+                document.getElementById("ids").textContent = ids.join(", ") || "-";
+                log("recs: [" + ids.join(", ") + "]");
+            }).catch(e => log("recs error: " + e))
+              .finally(() => { container.style.transition = "opacity 1s ease-in"; container.style.opacity = "1"; });
+        }
+
+        setTimeout(refreshRecommendations, 500);
+    </script>
+</body>
+</html>
