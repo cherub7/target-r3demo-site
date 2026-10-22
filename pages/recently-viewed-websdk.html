@@ -43,6 +43,9 @@
 
         .status { font-size: .85rem; min-height: 1.3em; }
         .status.ok { color: var(--ok); } .status.warn { color: var(--warn); } .status.err { color: var(--err); }
+        .pill { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+        .pill.busy { background: #fff4e5; color: #9a5b00; } .pill.done { background: #e6f4ea; color: #1e7e34; } .pill.stale { background: #fdecea; color: #b42318; }
+        .pill-time { color: var(--muted); font-size: .8rem; margin-left: .35rem; }
         .result-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: .875rem; margin-bottom: 1rem; }
         .result-meta .label { color: var(--muted); margin-right: .35rem; }
 
@@ -214,6 +217,10 @@
         const $ = id => document.getElementById(id);
         const log = m => { $("log").textContent += new Date().toLocaleTimeString() + "  " + m + "\n"; };
         const setStatus = (text, cls) => { $("stream-status").textContent = text; $("stream-status").className = "status " + (cls || ""); };
+        const setBadge = (label, cls, secs) => {
+            $("stream-status").className = "status";
+            $("stream-status").innerHTML = `<span class="pill ${cls}">${label}</span>` + (secs == null ? "" : `<span class="pill-time">(${secs} s)</span>`);
+        };
 
         const USER = localStorage.getItem(USER_KEY) || "poc-user-1";
         $("user-select").value = USER;
@@ -285,7 +292,7 @@
 
             clearTimeout(waitTimer);
             $("stream-btn").disabled = true;
-            setStatus("Streaming…");
+            setBadge("Streaming…", "busy");
             try {
                 const res = await fetch(inlet + (inlet.includes("?") ? "&" : "?") + "syncValidation=true", {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
@@ -299,7 +306,7 @@
                 }
                 log(`streamed ${USER} purchasedSkus=${value || "(empty)"} (xactionId ${out.xactionId || "-"})`);
                 if (value) { waitForEdge(value); }
-                else { setStatus(`Streamed an empty value at ${new Date().toLocaleTimeString()}.`, "ok"); }
+                else { setBadge("Streamed (empty)", "done"); }
             } catch (e) {
                 setStatus("Streaming failed: " + e.message, "err");
                 log("stream error: " + e);
@@ -308,7 +315,7 @@
             }
         }
 
-        // Refresh every 15 s until the design renders the new value (max 6 min).
+        // Refresh every 2 s until the design renders the new value (max 6 min).
         function waitForEdge(expected) {
             const start = Date.now();
             const norm = s => s.replace(/\s+/g, "");
@@ -316,19 +323,19 @@
                 await refreshRecommendations();
                 const secs = Math.round((Date.now() - start) / 1000);
                 if (norm($("aep-received").textContent).includes(norm(expected))) {
-                    setStatus(`Edge profile updated (${secs} s after streaming). View items to see the rule in action.`, "ok");
+                    setBadge("Updated", "done", secs);
                     log("edge profile has purchasedSkus=" + expected + " after " + secs + " s");
                     return;
                 }
                 if (secs > 360) {
-                    setStatus("Streamed, but Target's response doesn't show the new value after 6 min. Press Refresh to check again.", "warn");
+                    setBadge("Not updated, press Refresh", "stale", secs);
                     return;
                 }
-                setStatus(`Streamed. Waiting for the edge profile to update… ${secs} s`);
-                waitTimer = setTimeout(tick, 15000);
+                setBadge("Updating…", "busy", secs);
+                waitTimer = setTimeout(tick, 2000);
             };
-            setStatus("Streamed. Waiting for the edge profile to update…");
-            waitTimer = setTimeout(tick, 15000);
+            setBadge("Updating…", "busy", 0);
+            waitTimer = setTimeout(tick, 2000);
         }
 
         // ---- Web SDK ----
