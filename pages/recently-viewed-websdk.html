@@ -2,28 +2,58 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Recently Viewed Demo (Web SDK)</title>
+    <title>AEP Profile Attributes in Recommendations (Web SDK)</title>
     <link rel="stylesheet" href="../files/bootstrap.min.css">
     <style>
-        body { background: #f8f9fa; }
-        .section-header { background: #2d3748; border: none; padding: 1rem 1.25rem; }
-        .content-card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-        #available-items .card, #target-recs .card {
-            min-width: 150px; max-width: 150px; border: 1px solid #e9ecef; border-radius: 8px; background: white;
-            transition: all 0.3s ease;
+        :root {
+            --bg: #f4f5f7; --card: #ffffff; --text: #1f2933; --muted: #6b7280; --border: #e3e6ea;
+            --accent: #1473e6; --accent-dark: #0d5fc4; --accent-soft: #e8f1fd; --ok: #12805c; --warn: #b45309; --err: #c9252d;
         }
-        #available-items .card:hover, #target-recs .card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .page { max-width: 1040px; }
+        .eyebrow { color: var(--accent); font-weight: 600; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+        h1 { font-weight: 700; font-size: 1.9rem; }
+        .step { background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 3px rgba(16, 24, 40, .06); margin-bottom: 1.25rem; }
+        .step-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; padding: .9rem 1.25rem; border-bottom: 1px solid var(--border); }
+        .step-head h2 { font-size: 1.05rem; font-weight: 600; margin: 0; }
+        .step-head .hint { color: var(--muted); font-size: .85rem; }
+        .step-num { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: .85rem; display: flex; align-items: center; justify-content: center; }
+        .step-body { padding: 1.1rem 1.25rem; }
+        .btn-primary { background: var(--accent); border-color: var(--accent); font-weight: 500; }
+        .btn-primary:hover, .btn-primary:focus { background: var(--accent-dark); border-color: var(--accent-dark); }
+        .btn-outline-primary { color: var(--accent); border-color: var(--accent); }
+        .btn-outline-primary:hover { background: var(--accent); border-color: var(--accent); }
+        .form-label { font-size: .85rem; font-weight: 600; color: var(--muted); }
+        code.kv { background: #f3f4f6; color: var(--text); padding: 2px 6px; border-radius: 4px; font-size: .85em; }
+
+        #available-items .card, #target-recs .card { min-width: 150px; max-width: 150px; border: 1px solid var(--border); border-radius: 8px; transition: transform .2s ease, box-shadow .2s ease; }
+        #available-items .card:hover, #target-recs .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(16, 24, 40, .1); }
         #available-items .card-img-top, #target-recs .card-img-top { height: 120px; object-fit: cover; border-radius: 8px 8px 0 0; }
-        #available-items .card-body, #target-recs .card-body { padding: 0.75rem; }
-        #available-items h6, #target-recs h4, #target-recs h5, #target-recs h6 { font-size: 0.875rem; margin-bottom: 0.5rem; color: #2d3748; font-weight: 600; }
-        #available-items p, #target-recs p { font-size: 0.875rem; margin-bottom: 0.75rem; }
-        .btn-primary { background: #4a5568; border: none; font-weight: 500; border-radius: 6px; color: white; }
-        .btn-primary:hover { background: #2d3748; }
-        .btn-light { background: white; border: none; color: #2d3748; font-weight: 600; }
-        .btn-outline-secondary { border-color: #cbd5e0; color: #4a5568; border-radius: 8px; }
-        .btn-outline-secondary:hover { background: #4a5568; border-color: #4a5568; color: white; }
-        code.kv { background: #f7fafc; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
-        #log { font: 12px monospace; white-space: pre-wrap; max-height: 240px; overflow: auto; background: #1a202c; color: #e2e8f0; padding: .75rem; border-radius: 6px; margin: 0; }
+        #available-items .card-body, #target-recs .card-body { padding: .75rem; }
+        #available-items h6, #target-recs h4, #target-recs h5, #target-recs h6 { font-size: .875rem; margin-bottom: .5rem; font-weight: 600; }
+        #available-items p, #target-recs p { font-size: .875rem; margin-bottom: .75rem; }
+
+        .chip { border: 1px solid var(--border); background: #fff; color: var(--text); border-radius: 999px; padding: .2rem .7rem; font-size: .8rem; cursor: pointer; }
+        .chip:hover { border-color: var(--accent); }
+        .chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-dark); font-weight: 600; }
+        .chip-group { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+        .chip-label { font-size: .75rem; color: var(--muted); min-width: 78px; }
+        #skus { font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: .9rem; min-width: 220px; }
+        @media (max-width: 575px) { .skus-row { flex-wrap: wrap; } .skus-row > * { width: 100%; border-radius: 6px !important; } .skus-row .btn { margin-top: .4rem; } }
+
+        .status { font-size: .85rem; min-height: 1.3em; }
+        .status.ok { color: var(--ok); } .status.warn { color: var(--warn); } .status.err { color: var(--err); }
+        .result-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: .875rem; margin-bottom: 1rem; }
+        .result-meta .label { color: var(--muted); margin-right: .35rem; }
+
+        details.more { margin-top: .9rem; font-size: .85rem; }
+        details.more > summary { color: var(--muted); cursor: pointer; user-select: none; }
+        details.more > summary:hover { color: var(--accent); }
+        details.more[open] > summary { margin-bottom: .6rem; }
+        details.panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+        details.panel > summary { padding: .9rem 1.25rem; font-weight: 600; cursor: pointer; }
+        details.panel > div { padding: 0 1.25rem 1.1rem; }
+        #log { font: 12px SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 240px; overflow: auto; background: #111827; color: #e5e7eb; padding: .75rem; border-radius: 6px; margin: 0; }
     </style>
 
     <!-- AEP Web SDK (alloy.js) base code + library: https://experienceleague.adobe.com/en/docs/experience-platform/collection/js/install/library -->
@@ -33,82 +63,128 @@
     <script src="https://cdn1.adoberesources.net/alloy/2.36.0/alloy.min.js" async></script>
 </head>
 <body>
-    <div class="container py-5">
-        <div class="text-center mb-4">
-            <h1 class="display-5 fw-bold" style="color: #2d3748;">Recently Viewed Demo (Web SDK)</h1>
-            <p class="text-muted">Same activity as the at.js page, delivered through the AEP Web SDK and Edge Network.
-                Inclusion rules can use AEP edge profile attributes (<code>profile.UPA__bullseye.*</code>).</p>
+    <div class="container page py-5">
+        <div class="mb-4">
+            <div class="eyebrow">Adobe Target Recommendations · Web SDK</div>
+            <h1 class="mt-1 mb-2">AEP Profile Attributes in Recommendations</h1>
+            <p class="text-muted mb-0">Stream a visitor's purchased SKUs to their AEP profile, view a few items, and see Recommendations
+                exclude the purchased items at delivery time, using the AEP attribute <code>_bullseye.purchasedSkus</code>.</p>
         </div>
 
-        <div class="card mb-4 content-card">
-            <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0">Visitor</h2>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 align-items-center">
+        <!-- 1. Visitor -->
+        <div class="step">
+            <div class="step-head"><span class="step-num">1</span><h2>Visitor</h2></div>
+            <div class="step-body">
+                <div class="row g-3 align-items-end">
                     <div class="col-md-5">
-                        <label for="user-select" class="form-label small fw-bold mb-1">AEP identity (namespace <code>RecsPocId</code>)</label>
-                        <select id="user-select" class="form-select form-select-sm" onchange="switchUser(this.value)">
-                            <option value="poc-user-1">poc-user-1 (has purchasedSkus)</option>
-                            <option value="poc-user-2">poc-user-2 (control, no SKUs)</option>
+                        <label for="user-select" class="form-label mb-1">AEP identity (RecsPocId)</label>
+                        <select id="user-select" class="form-select" onchange="switchUser(this.value)">
+                            <option value="poc-user-1">poc-user-1</option>
+                            <option value="poc-user-2">poc-user-2 (control, no AEP data)</option>
                         </select>
                     </div>
                     <div class="col-md-7 small">
-                        <div><strong>ECID:</strong> <code id="ecid" class="kv">...</code></div>
-                        <div class="text-muted mt-1">Switching user clears this site's Web SDK cookies (<code>kndctr_*</code>, <code>AMCV_*</code>) and reloads,
-                            so each user gets a new ECID. This stops two users sharing one ECID, which could link them in the AEP identity graph.</div>
+                        <span class="text-muted">ECID</span> <code id="ecid" class="kv">...</code>
                     </div>
                 </div>
+                <details class="more">
+                    <summary>More details</summary>
+                    Switching clears this site's Web SDK cookies (<code>kndctr_*</code>, <code>AMCV_*</code>) and reloads, so each visitor
+                    gets a new ECID. This stops two visitors sharing one ECID, which could link them in the AEP identity graph.
+                </details>
             </div>
         </div>
 
-        <div class="card mb-4 content-card">
-            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Available Items</h2>
-                <button onclick="viewAll()" class="btn btn-light btn-sm">View all 5</button>
+        <!-- 2. AEP profile attribute -->
+        <div class="step">
+            <div class="step-head">
+                <span class="step-num">2</span><h2>Set the AEP profile attribute</h2>
+                <span class="hint ms-auto">streamed to AEP for <strong id="stream-user">-</strong></span>
             </div>
-            <div class="card-body">
+            <div class="step-body">
+                <label for="skus" class="form-label mb-1"><code>purchasedSkus</code> (JSON array stored as text)</label>
+                <div class="input-group skus-row mb-2">
+                    <input id="skus" class="form-control" spellcheck="false" placeholder='["r3demo-003","r3demo-005"]' oninput="syncChips()">
+                    <button id="stream-btn" class="btn btn-primary px-4" onclick="streamPurchasedSkus()">Stream to AEP</button>
+                </div>
+                <div class="chip-group mb-2"><span class="chip-label">Purchased</span><span id="item-chips" class="chip-group"></span>
+                    <button class="chip" onclick="setSkus([])">Clear ([])</button></div>
+                <div id="stream-status" class="status"></div>
+
+                <details class="more" id="stream-settings">
+                    <summary>Streaming settings</summary>
+                    <label for="inlet" class="form-label mb-1">Streaming inlet URL (HTTP API source)</label>
+                    <div class="input-group input-group-sm mb-2">
+                        <input id="inlet" type="password" class="form-control" autocomplete="off" placeholder="https://dcs.adobedc.net/collection/...">
+                        <button class="btn btn-outline-primary" onclick="saveInlet()">Save</button>
+                        <button class="btn btn-outline-secondary" onclick="forgetInlet()">Forget</button>
+                    </div>
+                    <div class="text-muted">
+                        Kept only for this browser tab (<code>sessionStorage</code>); it is not part of the page source.
+                        Each update streams the full profile record for the selected visitor: <code>purchasedSkus</code> from above, every other
+                        <code>_bullseye</code> field at its baseline value. The edge profile usually updates within 1–3 minutes; after streaming,
+                        the page refreshes the recommendations every 15 s until Target's response shows the new value.
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- 3. Items -->
+        <div class="step">
+            <div class="step-head">
+                <span class="step-num">3</span><h2>View items</h2>
+                <button onclick="viewAll()" class="btn btn-outline-primary btn-sm ms-auto">View all 5</button>
+            </div>
+            <div class="step-body">
                 <div id="available-items" class="d-flex flex-wrap" style="gap: 15px;"></div>
             </div>
         </div>
 
-        <div class="card mb-4 content-card">
-            <div class="card-header section-header text-white d-flex justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Your Recently Viewed Items</h2>
-                <button onclick="refreshRecommendations()" class="btn btn-light btn-sm">🔄 Refresh</button>
+        <!-- 4. Recommendations -->
+        <div class="step">
+            <div class="step-head">
+                <span class="step-num">4</span><h2>Recommendations</h2>
+                <span class="hint">Recently viewed, excluding the purchased SKUs</span>
+                <button onclick="refreshRecommendations()" class="btn btn-outline-primary btn-sm ms-auto">Refresh</button>
             </div>
-            <div class="card-body">
-                <div class="small mb-3"><strong>Recommended IDs:</strong> <span id="ids">-</span></div>
+            <div class="step-body">
                 <div id="target-recs">
-                    <div class="alert alert-info"><strong>No items viewed yet.</strong> Click on items above to view them.</div>
+                    <div class="alert alert-light border mb-0">No items viewed yet. View items in step 3.</div>
                 </div>
+                <details class="more">
+                    <summary>Recommended IDs and AEP values used by Target</summary>
+                    <div class="result-meta">
+                        <div><span class="label">Recommended IDs</span><strong id="ids">-</strong></div>
+                        <div><span class="label">AEP values used by Target</span><code id="aep-received" class="kv">-</code></div>
+                    </div>
+                </details>
             </div>
         </div>
 
-        <div class="card content-card">
-            <div class="card-header section-header text-white">
-                <h2 class="h5 mb-0">📝 Details and log</h2>
-            </div>
-            <div class="card-body">
+        <details class="panel">
+            <summary>Technical details and log</summary>
+            <div>
                 <div class="row g-3 small mb-3">
                     <div class="col-md-6">
                         <div class="mb-1"><strong>Client:</strong> <code class="kv">bullseye</code>
                             &nbsp;<strong>Activity ID:</strong> <code class="kv">1674070</code>
                             &nbsp;<strong>Rec-Unit ID:</strong> <code class="kv">387820</code></div>
                         <div class="mb-1"><strong>Datastream:</strong> <code class="kv">eaf93698-ef2e-41ee-b67a-808008dc26e3</code></div>
-                        <div><strong>Scopes:</strong> <code class="kv">item-view-mbox</code> (views), <code class="kv">r3demo-recently-viewed-recs</code> (recs)</div>
+                        <div class="mb-1"><strong>Scopes:</strong> <code class="kv">item-view-mbox</code> (views), <code class="kv">r3demo-recently-viewed-recs</code> (recs)</div>
+                        <div><strong>Inclusion rule:</strong> <code class="kv">id</code> is not contained in list <code class="kv">_bullseye.purchasedSkus</code></div>
                     </div>
                     <div class="col-md-6 text-muted">
+                        "AEP values used by Target" is the text the offer design renders from its <code>${aep._bullseye.*}</code> tokens.
                         Debug with Adobe Experience Platform Assurance (Target trace under the Edge events), or set
                         <code>alloy("setDebug", {enabled: true})</code> and watch the browser console.
                     </div>
                 </div>
                 <pre id="log"></pre>
             </div>
-        </div>
+        </details>
 
         <div class="mt-4 text-center">
-            <a href="../index.html" class="btn btn-outline-secondary" style="padding: 0.5rem 1.5rem;">← Back to Home</a>
+            <a href="../index.html" class="btn btn-outline-secondary btn-sm px-4">← Back to Home</a>
         </div>
     </div>
 
@@ -117,6 +193,16 @@
         const ORG_ID = "011B56B451AE49A90A490D4D@AdobeOrg";
         const RECS_SCOPE = "r3demo-recently-viewed-recs";
         const USER_KEY = "r3demo-websdk-user";
+        const INLET_KEY = "r3demo-websdk-inlet";
+        // Profile record target for the streaming inlet (identifiers, not credentials). Same record as the e2e run-case.sh script.
+        const STREAM = {
+            schemaRef: { id: "https://ns.adobe.com/bullseye/schemas/fae6404bbac19e36d1652e39eaed7cdeb292c0b4da819fea",
+                         contentType: "application/vnd.adobe.xed-full+json;version=1" },
+            datasetId: "6ac4dbfaa8fa65fff053de68",
+            flowId: "261863b1-993e-4707-8a7b-bc8a1d0f0df2",
+            baseline: { purchasedSkusArray: ["r3demo-003", "r3demo-005"], loyaltyPoints: 100, avgOrderValue: 49.99, isMember: true,
+                        lastPurchaseDate: "2026-10-01", lastPurchaseAt: "2026-10-01T10:00:00Z" }
+        };
         const ITEMS = [
             { id: "r3demo-001", name: "Laptop Computer", price: "$999.99", img: "../files/images/laptop.jpg" },
             { id: "r3demo-002", name: "Wireless Mouse", price: "$29.99", img: "../files/images/mouse.jpg" },
@@ -125,22 +211,127 @@
             { id: "r3demo-005", name: "Notebook Set", price: "$15.99", img: "../files/images/notebook.jpg" }
         ];
 
-        const log = m => { document.getElementById("log").textContent += new Date().toLocaleTimeString() + "  " + m + "\n"; };
+        const $ = id => document.getElementById(id);
+        const log = m => { $("log").textContent += new Date().toLocaleTimeString() + "  " + m + "\n"; };
+        const setStatus = (text, cls) => { $("stream-status").textContent = text; $("stream-status").className = "status " + (cls || ""); };
 
         const USER = localStorage.getItem(USER_KEY) || "poc-user-1";
-        document.getElementById("user-select").value = USER;
+        $("user-select").value = USER;
+        $("stream-user").textContent = USER;
         const identityMap = { RecsPocId: [{ id: USER, primary: true }] };
 
-        document.getElementById("available-items").innerHTML = ITEMS.map(i => `
+        $("available-items").innerHTML = ITEMS.map(i => `
             <div class="card text-center">
                 <img src="${i.img}" class="card-img-top" alt="${i.name}">
                 <div class="card-body">
                     <h6 class="card-title">${i.name}</h6>
-                    <p class="card-text text-primary fw-bold">${i.price}</p>
+                    <p class="card-text text-muted">${i.price}</p>
                     <button class="btn btn-primary btn-sm w-100" onclick="viewItem('${i.id}').then(refreshRecommendations)">View</button>
                 </div>
             </div>`).join("");
 
+        // ---- purchasedSkus editor ----
+        const chip = v => `<button class="chip" data-value="${v}" onclick="toggleValue('${v}')">${v}</button>`;
+        $("item-chips").innerHTML = ITEMS.map(i => chip(i.id)).join("");
+
+        function currentList() {
+            try { const v = JSON.parse($("skus").value); return Array.isArray(v) ? v.map(String) : []; } catch (e) { return []; }
+        }
+        function setSkus(list) { $("skus").value = JSON.stringify(list); syncChips(); }
+        function toggleValue(v) {
+            const list = currentList();
+            setSkus(list.includes(v) ? list.filter(x => x !== v) : [...list, v]);
+        }
+        function syncChips() {
+            const list = currentList();
+            document.querySelectorAll(".chip[data-value]").forEach(c => c.classList.toggle("active", list.includes(c.dataset.value)));
+        }
+
+        // ---- streaming inlet (kept in sessionStorage only) ----
+        function validInlet(u) {
+            try { const url = new URL(u); return url.protocol === "https:" && url.hostname.endsWith(".adobedc.net") && url.pathname.startsWith("/collection/"); }
+            catch (e) { return false; }
+        }
+        function saveInlet() {
+            const u = $("inlet").value.trim();
+            if (!validInlet(u)) { setStatus("The inlet URL must look like https://dcs.adobedc.net/collection/<id>.", "err"); return; }
+            sessionStorage.setItem(INLET_KEY, u);
+            setStatus("Inlet saved for this tab.", "ok");
+        }
+        function forgetInlet() { sessionStorage.removeItem(INLET_KEY); $("inlet").value = ""; setStatus("Inlet removed from this tab."); }
+        $("inlet").value = sessionStorage.getItem(INLET_KEY) || "";
+
+        let waitTimer = null;
+        async function streamPurchasedSkus() {
+            const inlet = sessionStorage.getItem(INLET_KEY);
+            if (!inlet) {
+                $("stream-settings").open = true;
+                setStatus("Enter and save the streaming inlet URL first (Streaming settings).", "warn");
+                return;
+            }
+            let value = $("skus").value.trim();
+            try { const p = JSON.parse(value); if (Array.isArray(p)) { value = JSON.stringify(p); } } catch (e) { /* plain text is allowed */ }
+
+            const body = {
+                header: { schemaRef: STREAM.schemaRef, imsOrgId: ORG_ID, datasetId: STREAM.datasetId, flowId: STREAM.flowId },
+                body: {
+                    xdmMeta: { schemaRef: STREAM.schemaRef },
+                    xdmEntity: {
+                        _id: USER === "poc-user-1" ? "recs-poc-1-stream" : "recs-" + USER + "-stream",
+                        _bullseye: { pocId: USER, purchasedSkus: value, ...STREAM.baseline }
+                    }
+                }
+            };
+
+            clearTimeout(waitTimer);
+            $("stream-btn").disabled = true;
+            setStatus("Streaming…");
+            try {
+                const res = await fetch(inlet + (inlet.includes("?") ? "&" : "?") + "syncValidation=true", {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+                });
+                const out = await res.json().catch(() => ({}));
+                const validation = out.synchronousValidation && out.synchronousValidation.status;
+                if (!res.ok || validation !== "pass") {
+                    setStatus(`Streaming failed (HTTP ${res.status}${validation ? ", validation " + validation : ""}). See the log.`, "err");
+                    log("stream error: " + JSON.stringify(out));
+                    return;
+                }
+                log(`streamed ${USER} purchasedSkus=${value || "(empty)"} (xactionId ${out.xactionId || "-"})`);
+                if (value) { waitForEdge(value); }
+                else { setStatus(`Streamed an empty value at ${new Date().toLocaleTimeString()}.`, "ok"); }
+            } catch (e) {
+                setStatus("Streaming failed: " + e.message, "err");
+                log("stream error: " + e);
+            } finally {
+                $("stream-btn").disabled = false;
+            }
+        }
+
+        // Refresh every 15 s until the design renders the new value (max 6 min).
+        function waitForEdge(expected) {
+            const start = Date.now();
+            const norm = s => s.replace(/\s+/g, "");
+            const tick = async () => {
+                await refreshRecommendations();
+                const secs = Math.round((Date.now() - start) / 1000);
+                if (norm($("aep-received").textContent).includes(norm(expected))) {
+                    setStatus(`Edge profile updated (${secs} s after streaming). View items to see the rule in action.`, "ok");
+                    log("edge profile has purchasedSkus=" + expected + " after " + secs + " s");
+                    return;
+                }
+                if (secs > 360) {
+                    setStatus("Streamed, but Target's response doesn't show the new value after 6 min. Press Refresh to check again.", "warn");
+                    return;
+                }
+                setStatus(`Streamed. Waiting for the edge profile to update… ${secs} s`);
+                waitTimer = setTimeout(tick, 15000);
+            };
+            setStatus("Streamed. Waiting for the edge profile to update…");
+            waitTimer = setTimeout(tick, 15000);
+        }
+
+        // ---- Web SDK ----
         function switchUser(user) {
             // Clear Web SDK cookies (kndctr_*) and the legacy AMCV_* cookie (alloy's ID migration reads ECID from it),
             // with and without a domain attribute, so alloy mints a new ECID.
@@ -157,7 +348,7 @@
         // thirdPartyCookiesEnabled: false so a shared demdex cookie can't give two users the same ECID.
         alloy("configure", { datastreamId: DATASTREAM_ID, orgId: ORG_ID, thirdPartyCookiesEnabled: false });
         alloy("getIdentity")
-            .then(r => { document.getElementById("ecid").textContent = r.identity.ECID; log("user " + USER + ", ECID " + r.identity.ECID); })
+            .then(r => { $("ecid").textContent = r.identity.ECID; log("user " + USER + ", ECID " + r.identity.ECID); })
             .catch(e => log("getIdentity error: " + e));
 
         function viewItem(id) {
@@ -176,7 +367,7 @@
         }
 
         function refreshRecommendations() {
-            const container = document.getElementById("target-recs");
+            const container = $("target-recs");
             container.style.opacity = "0.3";
             return alloy("sendEvent", {
                 xdm: { eventType: "decisioning.propositionFetch", identityMap },
@@ -186,11 +377,18 @@
                 const html = (result.propositions || []).filter(p => p.scope === RECS_SCOPE)
                     .flatMap(p => p.items || []).map(i => i.data && i.data.content)
                     .filter(c => typeof c === "string").join("");
-                if (html) { container.innerHTML = html; }
+                container.innerHTML = html || '<div class="alert alert-light border mb-0">No recommendations returned for this visitor.</div>';
+
+                // The design prints the AEP values as plain text before the item cards; show them in the summary line instead.
+                const wrapper = html ? container.firstElementChild : null;
+                const texts = wrapper ? [...wrapper.childNodes].filter(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) : [];
+                $("aep-received").textContent = texts.map(n => n.textContent.trim()).join(" ") || "-";
+                texts.forEach(n => n.remove());
+
                 // The design renders names only, so map image alt text back to item IDs.
                 const ids = [...html.replace(/<textarea[\s\S]*?<\/textarea>/g, "").matchAll(/alt='([^']+)'/g)]
                     .map(m => (ITEMS.find(i => m[1].startsWith(i.name)) || { id: "?" + m[1] }).id);
-                document.getElementById("ids").textContent = ids.join(", ") || "-";
+                $("ids").textContent = ids.join(", ") || "none";
                 log("recs: [" + ids.join(", ") + "]");
             }).catch(e => log("recs error: " + e))
               .finally(() => { container.style.transition = "opacity 1s ease-in"; container.style.opacity = "1"; });
